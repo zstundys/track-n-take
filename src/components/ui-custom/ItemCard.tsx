@@ -1,12 +1,17 @@
-
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import { Badge } from './Badge';
-import { cn } from '@/lib/utils';
-import { PantryItem, Category } from '@/types';
-import { formatDistanceToNow, isAfter, isBefore, format } from 'date-fns';
-import { AlertCircle, Check, AlertTriangle, Archive, ShoppingCart } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Badge } from "./Badge";
+import { cn } from "@/lib/utils";
+import { PantryItem, Category } from "@/types";
+import { formatDistanceToNow, isAfter, isBefore, format } from "date-fns";
+import {
+  AlertCircle,
+  Check,
+  AlertTriangle,
+  Archive,
+  ShoppingCart,
+} from "lucide-react";
 
 interface ItemCardProps {
   item: PantryItem;
@@ -16,19 +21,21 @@ interface ItemCardProps {
   className?: string;
 }
 
-const ItemCard: React.FC<ItemCardProps> = ({ 
-  item, 
-  category, 
-  onAddToShoppingList, 
+const ItemCard: React.FC<ItemCardProps> = ({
+  item,
+  category,
+  onAddToShoppingList,
   onView,
-  className 
+  className,
 }) => {
-  const isExpired = item.expirationDate && isBefore(new Date(item.expirationDate), new Date());
-  const isExpiringSoon = item.expirationDate && 
-    !isExpired && 
+  const isExpired =
+    item.expirationDate && isBefore(new Date(item.expirationDate), new Date());
+  const isExpiringSoon =
+    item.expirationDate &&
+    !isExpired &&
     isBefore(
-      new Date(item.expirationDate), 
-      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+      new Date(item.expirationDate),
+      new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     );
 
   const getStatusBadge = () => {
@@ -40,7 +47,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
         </Badge>
       );
     }
-    
+
     if (isExpired) {
       return (
         <Badge variant="red" className="gap-1" animated>
@@ -49,7 +56,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
         </Badge>
       );
     }
-    
+
     if (isExpiringSoon) {
       return (
         <Badge variant="yellow" className="gap-1" animated>
@@ -58,7 +65,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
         </Badge>
       );
     }
-    
+
     return (
       <Badge variant="green" className="gap-1" animated>
         <Check className="h-3 w-3" />
@@ -75,7 +82,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
       whileHover={{ scale: 1.02 }}
       className={className}
     >
-      <Card 
+      <Card
         className={cn(
           "overflow-hidden transition-all cursor-pointer hover:shadow-md",
           item.isFinished && "opacity-70"
@@ -86,14 +93,12 @@ const ItemCard: React.FC<ItemCardProps> = ({
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Badge variant={category.color as any}>
-                  {category.name}
-                </Badge>
+                <Badge variant={category.color as any}>{category.name}</Badge>
                 {getStatusBadge()}
               </div>
               <h3 className="font-medium text-lg">{item.name}</h3>
             </div>
-            
+
             {(item.isFinished || isExpired) && (
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -109,22 +114,29 @@ const ItemCard: React.FC<ItemCardProps> = ({
               </motion.button>
             )}
           </div>
-          
+
           <div className="mt-2 text-sm text-muted-foreground">
-            <p>{item.quantity} {item.unit}</p>
-            
+            <p>
+              {item.quantity} {item.unit}
+            </p>
+
             {item.expirationDate && (
               <p>
-                {isExpired 
-                  ? `Expired ${formatDistanceToNow(new Date(item.expirationDate), { addSuffix: true })}` 
-                  : `Expires ${formatDistanceToNow(new Date(item.expirationDate), { addSuffix: true })}`
-                }
+                {isExpired
+                  ? `Expired ${formatDistanceToNow(
+                      new Date(item.expirationDate),
+                      { addSuffix: true }
+                    )}`
+                  : `Expires ${formatDistanceToNow(
+                      new Date(item.expirationDate),
+                      { addSuffix: true }
+                    )}`}
               </p>
             )}
-            
+
             {item.purchaseDate && (
               <p className="mt-1 text-xs">
-                Purchased: {format(new Date(item.purchaseDate), 'MMM d, yyyy')}
+                Purchased: {format(new Date(item.purchaseDate), "MMM d, yyyy")}
               </p>
             )}
           </div>
