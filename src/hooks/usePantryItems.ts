@@ -4,6 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import getDatabase from '@/lib/db';
 import { PantryItem, Category, FilterOption, SortOption } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { deleteImage } from '@/utils/imageStorage';
 
 export const usePantryItems = (initialFilter: FilterOption = 'all', initialSort: SortOption = 'name') => {
   const [items, setItems] = useState<PantryItem[]>([]);
@@ -127,6 +128,11 @@ export const usePantryItems = (initialFilter: FilterOption = 'all', initialSort:
         throw new Error('Item not found');
       }
       
+      // If updating the image and there's an old image, delete it
+      if (updates.image !== undefined && item.image && updates.image !== item.image) {
+        deleteImage(item.image);
+      }
+      
       await item.update({
         $set: {
           ...updates,
@@ -159,6 +165,11 @@ export const usePantryItems = (initialFilter: FilterOption = 'all', initialSort:
       
       if (!item) {
         throw new Error('Item not found');
+      }
+      
+      // Delete any associated image
+      if (item.image) {
+        deleteImage(item.image);
       }
       
       await item.remove();

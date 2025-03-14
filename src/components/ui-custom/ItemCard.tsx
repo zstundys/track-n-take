@@ -1,3 +1,4 @@
+
 import React from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import {
   Archive,
   ShoppingCart,
 } from "lucide-react";
+import { getImage } from "@/utils/imageStorage";
 
 interface ItemCardProps {
   item: PantryItem;
@@ -74,6 +76,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
     );
   };
 
+  // Get item image if it exists
+  const itemImage = item.image ? getImage(item.image) : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -89,6 +94,16 @@ const ItemCard: React.FC<ItemCardProps> = ({
         )}
         onClick={onView}
       >
+        {itemImage && (
+          <div className="w-full h-32 bg-muted">
+            <img 
+              src={itemImage} 
+              alt={item.name} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        
         <div className="p-4">
           <div className="flex justify-between items-start">
             <div>

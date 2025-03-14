@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Camera, Scan } from 'lucide-react';
+import { Calendar as CalendarIcon, Scan, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,6 +24,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import { usePantryItems } from '@/hooks/usePantryItems';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
+import CameraCapture from '@/components/ui-custom/CameraCapture';
+import { getImage, deleteImage } from '@/utils/imageStorage';
 
 const AddItem: React.FC = () => {
   const navigate = useNavigate();
@@ -38,9 +40,30 @@ const AddItem: React.FC = () => {
   const [expirationDate, setExpirationDate] = useState<Date | undefined>(undefined);
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(new Date());
   const [notes, setNotes] = useState('');
+  const [imageId, setImageId] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
   
   // Form validation
   const isFormValid = name.trim() !== '' && categoryId !== '';
+  
+  // Handle image capture
+  const handleImageCaptured = (capturedImageId: string) => {
+    setImageId(capturedImageId);
+    setShowCamera(false);
+    
+    toast({
+      title: "Image Added",
+      description: "Photo has been attached to this item"
+    });
+  };
+  
+  // Remove image
+  const handleRemoveImage = () => {
+    if (imageId) {
+      deleteImage(imageId);
+      setImageId(null);
+    }
+  };
   
   // Submit form
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,6 +80,7 @@ const AddItem: React.FC = () => {
       purchaseDate: purchaseDate ? purchaseDate.getTime() : null,
       notes,
       isFinished: false,
+      image: imageId || undefined,
     });
     
     if (success) {
@@ -75,6 +99,33 @@ const AddItem: React.FC = () => {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-4">
+            {/* Image preview (if an image is selected) */}
+            {imageId && (
+              <div className="relative bg-muted rounded-lg overflow-hidden">
+                <img 
+                  src={getImage(imageId) || ''} 
+                  alt="Item" 
+                  className="w-full h-auto object-contain max-h-64"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 rounded-full opacity-90 hover:opacity-100"
+                  onClick={handleRemoveImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            
+            {/* Camera capture component */}
+            {showCamera && (
+              <div className="space-y-2">
+                <CameraCapture onImageCaptured={handleImageCaptured} />
+              </div>
+            )}
+            
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
                 Item Name <span className="text-destructive">*</span>
@@ -208,36 +259,33 @@ const AddItem: React.FC = () => {
               />
             </div>
             
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 gap-2"
-                onClick={() => {
-                  toast({
-                    title: "Coming Soon",
-                    description: "Barcode scanning will be available in a future update",
-                  });
-                }}
-              >
-                <Scan className="h-4 w-4" />
-                <span>Scan Barcode</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 gap-2"
-                onClick={() => {
-                  toast({
-                    title: "Coming Soon",
-                    description: "Photo capture will be available in a future update",
-                  });
-                }}
-              >
-                <Camera className="h-4 w-4" />
-                <span>Take Photo</span>
-              </Button>
-            </div>
+            {!showCamera && !imageId && (
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "Barcode scanning will be available in a future update",
+                    });
+                  }}
+                >
+                  <Scan className="h-4 w-4" />
+                  <span>Scan Barcode</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  onClick={() => setShowCamera(true)}
+                >
+                  <ImageIcon className="h-4 w-4" />
+                  <span>Add Photo</span>
+                </Button>
+              </div>
+            )}
           </div>
           
           <div className="flex gap-4">
