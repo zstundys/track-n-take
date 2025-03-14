@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,14 +19,18 @@ const queryClient = new QueryClient();
 const App = () => {
   // Register service worker for PWA
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => {
-            console.log('Service Worker registered with scope:', registration.scope);
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then((registration) => {
+            console.log(
+              "Service Worker registered with scope:",
+              registration.scope
+            );
           })
-          .catch(error => {
-            console.error('Service Worker registration failed:', error);
+          .catch((error) => {
+            console.error("Service Worker registration failed:", error);
           });
       });
     }
@@ -38,7 +41,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename="/track-n-take">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/shopping-list" element={<ShoppingList />} />
