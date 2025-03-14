@@ -1,7 +1,6 @@
 
 import { createRxDatabase, addRxPlugin } from 'rxdb';
-import { getRxStoragePouch, addPouchPlugin } from 'rxdb/plugins/pouchdb';
-import * as idb from 'pouchdb-adapter-idb';
+import { getRxStorageMemory } from 'rxdb/plugins/storage-memory';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration';
 import { pantryItemSchema } from '../types';
@@ -9,7 +8,6 @@ import { pantryItemSchema } from '../types';
 // Add plugins
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
-addPouchPlugin(idb);
 
 // Database instance
 let dbPromise: Promise<any> | null = null;
@@ -19,7 +17,7 @@ export const getDatabase = async () => {
 
   dbPromise = createRxDatabase({
     name: 'pantrydb',
-    storage: getRxStoragePouch('idb'),
+    storage: getRxStorageMemory()
   }).then(async (db) => {
     // Create collections
     await db.addCollections({
