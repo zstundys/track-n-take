@@ -13,10 +13,6 @@ import NotFound from "./pages/NotFound";
 // Import i18n configuration
 import "./i18n";
 
-// Import fonts
-import "@fontsource-variable/inter";
-import "@fontsource-variable/playfair-display";
-
 const queryClient = new QueryClient();
 
 const App = () => {
