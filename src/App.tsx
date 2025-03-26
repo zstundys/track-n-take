@@ -25,7 +25,7 @@ const App = () => {
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker
-          .register("/service-worker.js")
+          .register("/track-n-take/service-worker.js")
           .then((registration) => {
             console.log(
               "Service Worker registered with scope:",
