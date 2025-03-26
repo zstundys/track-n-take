@@ -1,0 +1,165 @@
+{
+  "navigation": {
+    "pantry": "Sandėlis",
+    "shopping": "Apsipirkimas",
+    "add": "Pridėti",
+    "settings": "Nustatymai"
+  },
+  "pantry": {
+    "title": "Mano sandėlis",
+    "itemCount": "{{count}} prekių jūsų sandėlyje",
+    "search": "Ieškoti prekių...",
+    "filter": {
+      "title": "Filtras",
+      "all": "Visos prekės",
+      "expiring": "Greitai baigsis",
+      "expired": "Pasibaigę",
+      "finished": "Išnaudota"
+    },
+    "sort": {
+      "title": "Rūšiuoti pagal",
+      "name": "Pavadinimą",
+      "expirationDate": "Galiojimo datą",
+      "purchaseDate": "Pirkimo datą",
+      "category": "Kategoriją"
+    },
+    "categoryFilterSoon": "Filtravimas pagal kategoriją bus prieinamas netrukus",
+    "loading": "Kraunami sandėlio elementai...",
+    "empty": "Jūsų sandėlis tuščias",
+    "emptyDescription": "Pridėkite prekes į savo sandėlį, kad galėtumėte sekti, ką turite",
+    "addFirst": "Pridėti pirmą prekę",
+    "itemCard": {
+      "expires": "Galioja iki",
+      "expired": "Pasibaigęs",
+      "daysAgo": "prieš {{count}} d.",
+      "daysLeft": "liko {{count}} d.",
+      "today": "Šiandien",
+      "quantity": "Kiekis",
+      "addToShopping": "Į pirkinių sąrašą"
+    }
+  },
+  "shoppingList": {
+    "title": "Pirkinių sąrašas",
+    "stats": "{{checked}}/{{total}} prekių pažymėta",
+    "search": "Ieškoti prekių...",
+    "addItem": "Pridėti prekę",
+    "clearChecked": "Išvalyti pažymėtas",
+    "loading": "Kraunamas pirkinių sąrašas...",
+    "empty": "Jūsų pirkinių sąrašas tuščias",
+    "emptyDescription": "Pridėkite prekes į savo pirkinių sąrašą, kad galėtumėte sekti, ką reikia nupirkti",
+    "addFirst": "Pridėti pirmą prekę",
+    "addDialog": {
+      "title": "Pridėti prekę į pirkinių sąrašą",
+      "nameLabel": "Prekės pavadinimas",
+      "namePlaceholder": "Įveskite prekės pavadinimą",
+      "quantityLabel": "Kiekis",
+      "unitLabel": "Vienetas",
+      "unitItem": "vnt",
+      "unitPack": "pak",
+      "unitKg": "kg",
+      "unitLiter": "l",
+      "unitOther": "kita",
+      "categoryLabel": "Kategorija (neprivaloma)",
+      "categoryPlaceholder": "Pasirinkite kategoriją",
+      "cancel": "Atšaukti",
+      "add": "Pridėti prekę"
+    }
+  },
+  "addItem": {
+    "title": "Pridėti prekę",
+    "subtitle": "Pridėti naują prekę į sandėlį",
+    "imageAdded": "Nuotrauka pridėta",
+    "imageAttached": "Nuotrauka prisegta prie šios prekės",
+    "form": {
+      "nameLabel": "Prekės pavadinimas",
+      "namePlaceholder": "Įveskite prekės pavadinimą",
+      "quantityLabel": "Kiekis",
+      "unitLabel": "Vienetas",
+      "unitItem": "vnt",
+      "unitPack": "pak",
+      "unitKg": "kg",
+      "unitLiter": "l",
+      "unitOther": "kita",
+      "categoryLabel": "Kategorija",
+      "categoryPlaceholder": "Pasirinkite kategoriją",
+      "expirationLabel": "Galiojimo data",
+      "expirationPlaceholder": "Pasirinkite datą",
+      "purchaseDateLabel": "Pirkimo data",
+      "purchaseDatePlaceholder": "Pasirinkite datą",
+      "notesLabel": "Pastabos (neprivaloma)",
+      "notesPlaceholder": "Pridėkite papildomas pastabas",
+      "itemImage": "Prekės nuotrauka",
+      "takePhoto": "Fotografuoti",
+      "cancelPhoto": "Atšaukti fotografavimą",
+      "submit": "Pridėti į sandėlį",
+      "success": "Prekė pridėta į sandėlį",
+      "error": "Nepavyko pridėti prekės"
+    }
+  },
+  "settings": {
+    "title": "Nustatymai",
+    "subtitle": "Tvarkykite savo nuostatas ir programos duomenis",
+    "appearance": {
+      "title": "Išvaizda",
+      "darkMode": "Tamsusis režimas",
+      "darkModeDescription": "Perjungti tarp šviesios ir tamsios temos"
+    },
+    "language": {
+      "title": "Kalba",
+      "description": "Pakeisti programos kalbą",
+      "english": "Anglų",
+      "lithuanian": "Lietuvių"
+    },
+    "dataManagement": {
+      "title": "Duomenų valdymas",
+      "syncData": "Sinchronizuoti duomenis",
+      "syncDescription": "Rankiniu būdu sinchronizuoti pakeitimus su debesimi",
+      "syncButton": "Sinchronizuoti",
+      "exportData": "Eksportuoti duomenis",
+      "exportDescription": "Eksportuoti sandėlio ir apsipirkimo sąrašo duomenis",
+      "exportButton": "Eksportuoti",
+      "importData": "Importuoti duomenis",
+      "importDescription": "Importuoti duomenis iš atsarginės kopijos failo",
+      "importButton": "Importuoti",
+      "clearData": "Išvalyti visus duomenis",
+      "clearDescription": "Visam laikui ištrinti visus jūsų duomenis",
+      "clearButton": "Išvalyti"
+    },
+    "about": {
+      "title": "Apie",
+      "version": "Versija",
+      "versionDescription": "Dabartinė programos versija",
+      "sourceCode": "Išeitinis kodas",
+      "sourceDescription": "Peržiūrėti išeitinį kodą GitHub platformoje",
+      "sourceButton": "GitHub",
+      "offlineInfo": "Ši programa veikia visiškai neprisijungus. Visi jūsų duomenys saugomi lokaliai jūsų įrenginyje naudojant IndexedDB."
+    },
+    "deleteDialog": {
+      "title": "Ar tikrai esate įsitikinę?",
+      "description": "Šio veiksmo negalima atšaukti. Tai visam laikui ištrins visus jūsų sandėlio elementus, apsipirkimo sąrašus ir nustatymus.",
+      "cancel": "Atšaukti",
+      "confirm": "Ištrinti viską"
+    }
+  },
+  "categories": {
+    "fruitsVegetables": "Vaisiai ir daržovės",
+    "dairy": "Pieno produktai",
+    "meatFish": "Mėsa ir žuvis",
+    "grains": "Grūdai ir makaronai",
+    "cannedGoods": "Konservuoti produktai",
+    "spicesHerbs": "Prieskoniai ir žolelės",
+    "snacks": "Užkandžiai",
+    "beverages": "Gėrimai",
+    "other": "Kita"
+  },
+  "common": {
+    "unknown": "Nežinoma",
+    "category": "Kategorija",
+    "comingSoon": "Netrukus",
+    "notFound": {
+      "title": "Puslapis nerastas",
+      "description": "Puslapis, kurio ieškote, neegzistuoja arba buvo perkeltas.",
+      "backHome": "Grįžti į pradžią"
+    }
+  }
+}

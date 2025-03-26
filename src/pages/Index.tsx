@@ -1,9 +1,11 @@
-
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, SortAsc, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, SortAsc, RefreshCw, ShoppingBag, PlusCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import {
+import { Button } from '@/components/ui/button';
+import { 
   Select,
   SelectContent,
   SelectItem,
@@ -17,9 +19,12 @@ import { usePantryItems } from '@/hooks/usePantryItems';
 import { FilterOption, SortOption } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
+import { translateCategory } from '@/utils/categoryTranslation';
 
 const PantryPage: React.FC = () => {
   const { toast } = useToast();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const {
     items,
@@ -33,17 +38,17 @@ const PantryPage: React.FC = () => {
   } = usePantryItems();
 
   const filterOptions: { value: FilterOption; label: string }[] = [
-    { value: 'all', label: 'All Items' },
-    { value: 'expiring', label: 'Expiring Soon' },
-    { value: 'expired', label: 'Expired' },
-    { value: 'finished', label: 'Out of Stock' },
+    { value: 'all', label: t('pantry.filter.all') },
+    { value: 'expiring', label: t('pantry.filter.expiring') },
+    { value: 'expired', label: t('pantry.filter.expired') },
+    { value: 'finished', label: t('pantry.filter.finished') },
   ];
 
   const sortOptions: { value: SortOption; label: string }[] = [
-    { value: 'name', label: 'Name' },
-    { value: 'expirationDate', label: 'Expiration Date' },
-    { value: 'purchaseDate', label: 'Purchase Date' },
-    { value: 'category', label: 'Category' },
+    { value: 'name', label: t('pantry.sort.name') },
+    { value: 'expirationDate', label: t('pantry.sort.expirationDate') },
+    { value: 'purchaseDate', label: t('pantry.sort.purchaseDate') },
+    { value: 'category', label: t('pantry.sort.category') },
   ];
 
   // Filter items by search query
@@ -56,7 +61,7 @@ const PantryPage: React.FC = () => {
     return (
       categories.find((cat) => cat.id === categoryId) || {
         id: 'unknown',
-        name: 'Unknown',
+        name: t('common.unknown'),
         color: 'gray',
         icon: 'box',
         createdAt: 0,
@@ -83,16 +88,16 @@ const PantryPage: React.FC = () => {
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-medium">My Pantry</h1>
+            <h1 className="text-3xl font-medium">{t('pantry.title')}</h1>
             <p className="text-muted-foreground">
-              {filteredItems.length} items in your pantry
+              {t('pantry.itemCount', { count: filteredItems.length })}
             </p>
           </div>
           
           <div className="relative w-full md:w-auto">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search items..."
+              placeholder={t('pantry.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 w-full md:w-64 rounded-full bg-background border-input"
@@ -104,7 +109,7 @@ const PantryPage: React.FC = () => {
           <Select value={filter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[150px] h-9 gap-1">
               <Filter className="h-4 w-4" />
-              <SelectValue placeholder="Filter" />
+              <SelectValue placeholder={t('pantry.filter.title')} />
             </SelectTrigger>
             <SelectContent>
               {filterOptions.map((option) => (
@@ -118,7 +123,7 @@ const PantryPage: React.FC = () => {
           <Select value={sortBy} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[150px] h-9 gap-1">
               <SortAsc className="h-4 w-4" />
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t('pantry.sort.title')} />
             </SelectTrigger>
             <SelectContent>
               {sortOptions.map((option) => (
@@ -136,12 +141,12 @@ const PantryPage: React.FC = () => {
               className="whitespace-nowrap cursor-pointer"
               onClick={() => {
                 toast({
-                  title: "Coming Soon",
-                  description: "Category filtering will be available soon",
+                  title: t('common.comingSoon'),
+                  description: t('pantry.categoryFilterSoon'),
                 });
               }}
             >
-              {category.name}
+              {translateCategory(t, category.id)}
             </Badge>
           ))}
         </div>
@@ -149,37 +154,34 @@ const PantryPage: React.FC = () => {
         {isLoading ? (
           <div className="flex justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+            <span className="sr-only">{t('pantry.loading')}</span>
           </div>
         ) : filteredItems.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-12"
-          >
-            <h3 className="text-xl font-medium mb-2">No items found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchQuery
-                ? "No items match your search criteria"
-                : filter !== 'all'
-                ? "No items match the selected filter"
-                : "Add your first pantry item to get started"}
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="bg-primary/10 rounded-full p-6 mb-4">
+              <ShoppingBag className="h-12 w-12 text-primary" />
+            </div>
+            <h2 className="text-2xl font-medium mb-2">{t('pantry.empty')}</h2>
+            <p className="text-muted-foreground max-w-md mb-6">
+              {t('pantry.emptyDescription')}
             </p>
-          </motion.div>
+            <Button 
+              size="lg" 
+              className="gap-2"
+              onClick={() => navigate('/add-item')}
+            >
+              <PlusCircle className="h-5 w-5" />
+              <span>{t('pantry.addFirst')}</span>
+            </Button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredItems.map((item) => (
               <ItemCard
                 key={item.id}
                 item={item}
                 category={getCategoryForItem(item.categoryId)}
                 onAddToShoppingList={() => addToShoppingList(item)}
-                onView={() => {
-                  // View details (will implement in future)
-                  toast({
-                    title: "Coming Soon",
-                    description: "Item details view will be available soon",
-                  });
-                }}
               />
             ))}
           </div>

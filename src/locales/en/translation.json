@@ -1,0 +1,165 @@
+{
+  "navigation": {
+    "pantry": "Pantry",
+    "shopping": "Shopping",
+    "add": "Add",
+    "settings": "Settings"
+  },
+  "pantry": {
+    "title": "My Pantry",
+    "itemCount": "{{count}} items in your pantry",
+    "search": "Search items...",
+    "filter": {
+      "title": "Filter",
+      "all": "All items",
+      "expiring": "Expiring soon",
+      "expired": "Expired",
+      "finished": "Finished"
+    },
+    "sort": {
+      "title": "Sort by",
+      "name": "Name",
+      "expirationDate": "Expiration date",
+      "purchaseDate": "Purchase date",
+      "category": "Category"
+    },
+    "categoryFilterSoon": "Category filtering will be available soon",
+    "loading": "Loading pantry items...",
+    "empty": "Your pantry is empty",
+    "emptyDescription": "Add items to your pantry to keep track of what you have",
+    "addFirst": "Add first item",
+    "itemCard": {
+      "expires": "Expires",
+      "expired": "Expired",
+      "daysAgo": "{{count}} days ago",
+      "daysLeft": "{{count}} days left",
+      "today": "Today",
+      "quantity": "Quantity",
+      "addToShopping": "Add to shopping"
+    }
+  },
+  "shoppingList": {
+    "title": "Shopping List",
+    "stats": "{{checked}}/{{total}} items checked",
+    "search": "Search items...",
+    "addItem": "Add item",
+    "clearChecked": "Clear checked",
+    "loading": "Loading shopping list...",
+    "empty": "Your shopping list is empty",
+    "emptyDescription": "Add items to your shopping list to keep track of what you need to buy",
+    "addFirst": "Add first item",
+    "addDialog": {
+      "title": "Add item to shopping list",
+      "nameLabel": "Item name",
+      "namePlaceholder": "Enter item name",
+      "quantityLabel": "Quantity",
+      "unitLabel": "Unit",
+      "unitItem": "item",
+      "unitPack": "pack",
+      "unitKg": "kg",
+      "unitLiter": "l",
+      "unitOther": "other",
+      "categoryLabel": "Category (optional)",
+      "categoryPlaceholder": "Select a category",
+      "cancel": "Cancel",
+      "add": "Add item"
+    }
+  },
+  "addItem": {
+    "title": "Add Item",
+    "subtitle": "Add a new item to your pantry",
+    "imageAdded": "Image added",
+    "imageAttached": "Image attached to this item",
+    "form": {
+      "nameLabel": "Item name",
+      "namePlaceholder": "Enter item name",
+      "quantityLabel": "Quantity",
+      "unitLabel": "Unit",
+      "unitItem": "item",
+      "unitPack": "pack",
+      "unitKg": "kg",
+      "unitLiter": "l",
+      "unitOther": "other",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Select a category",
+      "expirationLabel": "Expiration date",
+      "expirationPlaceholder": "Select a date",
+      "purchaseDateLabel": "Purchase date",
+      "purchaseDatePlaceholder": "Select a date",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Add any additional notes",
+      "itemImage": "Item image",
+      "takePhoto": "Take photo",
+      "cancelPhoto": "Cancel photo",
+      "submit": "Add to pantry",
+      "success": "Item added to pantry",
+      "error": "Failed to add item"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and app data",
+    "appearance": {
+      "title": "Appearance",
+      "darkMode": "Dark mode",
+      "darkModeDescription": "Toggle between light and dark theme"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Change the application language",
+      "english": "English",
+      "lithuanian": "Lithuanian"
+    },
+    "dataManagement": {
+      "title": "Data Management",
+      "syncData": "Sync data",
+      "syncDescription": "Manually sync changes to the cloud",
+      "syncButton": "Sync",
+      "exportData": "Export data",
+      "exportDescription": "Export your pantry and shopping list data",
+      "exportButton": "Export",
+      "importData": "Import data",
+      "importDescription": "Import data from a backup file",
+      "importButton": "Import",
+      "clearData": "Clear all data",
+      "clearDescription": "Permanently delete all your data",
+      "clearButton": "Clear"
+    },
+    "about": {
+      "title": "About",
+      "version": "Version",
+      "versionDescription": "Current app version",
+      "sourceCode": "Source code",
+      "sourceDescription": "View the source code on GitHub",
+      "sourceButton": "GitHub",
+      "offlineInfo": "This app works completely offline. All your data is stored locally on your device using IndexedDB."
+    },
+    "deleteDialog": {
+      "title": "Are you sure?",
+      "description": "This action cannot be undone. This will permanently delete all your pantry items, shopping lists, and settings.",
+      "cancel": "Cancel",
+      "confirm": "Delete everything"
+    }
+  },
+  "categories": {
+    "fruitsVegetables": "Fruits & Vegetables",
+    "dairy": "Dairy",
+    "meatFish": "Meat & Fish",
+    "grains": "Grains & Pasta",
+    "cannedGoods": "Canned Goods",
+    "spicesHerbs": "Spices & Herbs",
+    "snacks": "Snacks",
+    "beverages": "Beverages",
+    "other": "Other"
+  },
+  "common": {
+    "unknown": "Unknown",
+    "category": "Category",
+    "comingSoon": "Coming Soon",
+    "notFound": {
+      "title": "Page not found",
+      "description": "The page you are looking for doesn't exist or has been moved.",
+      "backHome": "Back to home"
+    }
+  }
+}

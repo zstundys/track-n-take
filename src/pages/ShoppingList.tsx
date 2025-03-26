@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { translateCategory } from '@/utils/categoryTranslation';
 
 const ShoppingList: React.FC = () => {
+  const { t } = useTranslation();
   const {
     items,
     categories,
@@ -42,7 +45,7 @@ const ShoppingList: React.FC = () => {
   // New item form state
   const [newItemName, setNewItemName] = useState('');
   const [newItemQuantity, setNewItemQuantity] = useState(1);
-  const [newItemUnit, setNewItemUnit] = useState('item');
+  const [newItemUnit, setNewItemUnit] = useState(t('shoppingList.addDialog.unitItem'));
   const [newItemCategory, setNewItemCategory] = useState('');
   
   // Filter items by search query
@@ -55,7 +58,7 @@ const ShoppingList: React.FC = () => {
     return (
       categories.find((cat) => cat.id === categoryId) || {
         id: 'unknown',
-        name: 'Unknown',
+        name: t('common.unknown'),
         color: 'gray',
         icon: 'box',
         createdAt: 0,
@@ -79,7 +82,7 @@ const ShoppingList: React.FC = () => {
     // Reset form
     setNewItemName('');
     setNewItemQuantity(1);
-    setNewItemUnit('item');
+    setNewItemUnit(t('shoppingList.addDialog.unitItem'));
     setNewItemCategory('');
     setIsAddDialogOpen(false);
   };
@@ -97,202 +100,215 @@ const ShoppingList: React.FC = () => {
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-medium">Shopping List</h1>
+            <h1 className="text-3xl font-medium">{t('shoppingList.title')}</h1>
             <p className="text-muted-foreground">
-              {checkedItems} of {totalItems} items checked
+              {t('shoppingList.stats', { checked: checkedItems, total: totalItems })}
             </p>
           </div>
           
-          <div className="flex gap-2 self-end">
+          <div className="flex gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-initial">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder={t('shoppingList.search')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 w-full sm:w-64 rounded-full bg-background border-input"
+              />
+            </div>
             <Button 
-              variant="outline" 
               size="sm" 
-              className="gap-1"
-              onClick={() => addFromPantry('all')}
-            >
-              <ShoppingBag className="h-4 w-4" />
-              <span>Add from Pantry</span>
-            </Button>
-            
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="gap-1"
+              className="gap-2"
               onClick={() => setIsAddDialogOpen(true)}
             >
               <Plus className="h-4 w-4" />
-              <span>Add Item</span>
+              <span className="hidden sm:inline">{t('shoppingList.addItem')}</span>
             </Button>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between mb-6 gap-4">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search items..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 w-full rounded-full bg-background border-input"
-            />
-          </div>
-          
-          {checkedItems > 0 && (
             <Button 
-              variant="outline" 
               size="sm" 
-              className="gap-1 shrink-0"
-              onClick={() => clearCheckedItems()}
+              variant="outline" 
+              className="gap-2"
+              onClick={clearCheckedItems}
+              disabled={checkedItems === 0}
             >
-              <Trash2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Clear Checked</span>
+              <CheckSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('shoppingList.clearChecked')}</span>
             </Button>
-          )}
+          </div>
         </div>
         
-        <AnimatePresence>
-          {filteredItems.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="text-center py-12"
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <ShoppingBag className="h-8 w-8 animate-pulse text-primary" />
+            <span className="sr-only">{t('shoppingList.loading')}</span>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="bg-primary/10 rounded-full p-6 mb-4">
+              <ShoppingBag className="h-12 w-12 text-primary" />
+            </div>
+            <h2 className="text-2xl font-medium mb-2">{t('shoppingList.empty')}</h2>
+            <p className="text-muted-foreground max-w-md mb-6">
+              {t('shoppingList.emptyDescription')}
+            </p>
+            <Button 
+              size="lg" 
+              className="gap-2"
+              onClick={() => setIsAddDialogOpen(true)}
             >
-              <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Your shopping list is empty</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchQuery
-                  ? "No items match your search"
-                  : "Add items to your shopping list"}
-              </p>
-              <Button onClick={() => setIsAddDialogOpen(true)}>
-                Add Your First Item
-              </Button>
-            </motion.div>
-          ) : (
-            <ul className="space-y-2">
+              <Plus className="h-5 w-5" />
+              <span>{t('shoppingList.addFirst')}</span>
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <AnimatePresence initial={false}>
               {filteredItems.map((item) => {
                 const category = getCategoryForItem(item.categoryId);
                 
                 return (
-                  <motion.li
+                  <motion.div
                     key={item.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    layout
                   >
-                    <Card className={`p-3 flex items-center ${item.isChecked ? 'bg-secondary/50' : ''}`}>
-                      <Checkbox
+                    <Card className={cn(
+                      "flex items-center p-3 gap-3",
+                      item.isChecked && "bg-muted/50"
+                    )}>
+                      <Checkbox 
                         checked={item.isChecked}
-                        onCheckedChange={(checked) => 
-                          toggleItemCheck(item.id, checked === true)
-                        }
-                        className="mr-3"
+                        onCheckedChange={(checked) => toggleItemCheck(item.id,Boolean(checked))}
+                        className="h-5 w-5"
                       />
+                      
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant={category.color as any} size="sm">
-                            {category.name}
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            "font-medium",
+                            item.isChecked && "line-through text-muted-foreground"
+                          )}>
+                            {item.name}
+                          </span>
+                          <Badge variant={category.color as any} className="text-[10px]">
+                            {translateCategory(t, category.id)}
                           </Badge>
                         </div>
-                        <p className={`font-medium ${item.isChecked ? 'line-through text-muted-foreground' : ''}`}>
-                          {item.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
+                        <div className="text-sm text-muted-foreground">
                           {item.quantity} {item.unit}
-                        </p>
+                          {item.quantity > 1 && item.unit !== t('shoppingList.addDialog.unitKg') && item.unit !== t('shoppingList.addDialog.unitLiter') ? 's' : ''}
+                        </div>
                       </div>
+                      
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         onClick={() => deleteItem(item.id)}
-                        className="ml-2 text-muted-foreground hover:text-destructive"
                       >
-                        <XCircle className="h-5 w-5" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </Card>
-                  </motion.li>
+                  </motion.div>
                 );
               })}
-            </ul>
-          )}
-        </AnimatePresence>
+            </AnimatePresence>
+          </div>
+        )}
       </motion.div>
       
-      {/* Add Item Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Item</DialogTitle>
+            <DialogTitle>{t('shoppingList.addDialog.title')}</DialogTitle>
           </DialogHeader>
+          
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Item Name
+            <div className="space-y-2">
+              <label htmlFor="item-name" className="text-sm font-medium">
+                {t('shoppingList.addDialog.nameLabel')}
               </label>
               <Input
-                id="name"
+                id="item-name"
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
-                placeholder="Enter item name"
-                autoComplete="off"
+                placeholder={t('shoppingList.addDialog.namePlaceholder')}
               />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <label htmlFor="quantity" className="text-sm font-medium">
-                  Quantity
+              <div className="space-y-2">
+                <label htmlFor="item-quantity" className="text-sm font-medium">
+                  {t('shoppingList.addDialog.quantityLabel')}
                 </label>
                 <Input
-                  id="quantity"
+                  id="item-quantity"
                   type="number"
                   min="1"
                   value={newItemQuantity}
                   onChange={(e) => setNewItemQuantity(Number(e.target.value))}
                 />
               </div>
-              <div className="grid gap-2">
-                <label htmlFor="unit" className="text-sm font-medium">
-                  Unit
+              
+              <div className="space-y-2">
+                <label htmlFor="item-unit" className="text-sm font-medium">
+                  {t('shoppingList.addDialog.unitLabel')}
                 </label>
-                <Input
-                  id="unit"
+                <Select
                   value={newItemUnit}
-                  onChange={(e) => setNewItemUnit(e.target.value)}
-                  placeholder="e.g., pack, bottle, lb"
-                />
+                  onValueChange={setNewItemUnit}
+                >
+                  <SelectTrigger id="item-unit">
+                    <SelectValue placeholder={t('shoppingList.addDialog.unitLabel')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={t('shoppingList.addDialog.unitItem')}>{t('shoppingList.addDialog.unitItem')}</SelectItem>
+                    <SelectItem value={t('shoppingList.addDialog.unitPack')}>{t('shoppingList.addDialog.unitPack')}</SelectItem>
+                    <SelectItem value={t('shoppingList.addDialog.unitKg')}>{t('shoppingList.addDialog.unitKg')}</SelectItem>
+                    <SelectItem value={t('shoppingList.addDialog.unitLiter')}>{t('shoppingList.addDialog.unitLiter')}</SelectItem>
+                    <SelectItem value={t('shoppingList.addDialog.unitOther')}>{t('shoppingList.addDialog.unitOther')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
-            <div className="grid gap-2">
-              <label htmlFor="category" className="text-sm font-medium">
-                Category
+            <div className="space-y-2">
+              <label htmlFor="item-category" className="text-sm font-medium">
+                {t('shoppingList.addDialog.categoryLabel')}
               </label>
               <Select
                 value={newItemCategory}
                 onValueChange={setNewItemCategory}
               >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
+                <SelectTrigger id="item-category">
+                  <SelectValue placeholder={t('shoppingList.addDialog.categoryPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name}
+                      {translateCategory(t, category.id)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+          
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-              Cancel
+            <Button
+              variant="outline"
+              onClick={() => setIsAddDialogOpen(false)}
+            >
+              {t('shoppingList.addDialog.cancel')}
             </Button>
-            <Button onClick={handleAddItem}>Add Item</Button>
+            <Button
+              onClick={handleAddItem}
+              disabled={!newItemName.trim()}
+            >
+              {t('shoppingList.addDialog.add')}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -10,6 +10,9 @@ import AddItem from "./pages/AddItem";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
+// Import i18n configuration
+import "./i18n";
+
 // Import fonts
 import "@fontsource-variable/inter";
 import "@fontsource-variable/playfair-display";
@@ -41,7 +44,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename="/track-n-take">
+        <BrowserRouter basename="/track-n-take/">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/shopping-list" element={<ShoppingList />} />

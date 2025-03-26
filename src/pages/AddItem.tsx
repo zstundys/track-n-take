@@ -1,7 +1,10 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Scan, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,16 +29,18 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import CameraCapture from '@/components/ui-custom/CameraCapture';
 import { getImage, deleteImage } from '@/utils/imageStorage';
+import { translateCategory } from '@/utils/categoryTranslation';
 
 const AddItem: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { categories, addItem } = usePantryItems();
   
   // Form state
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [unit, setUnit] = useState('item');
+  const [unit, setUnit] = useState(t('addItem.form.unitItem'));
   const [categoryId, setCategoryId] = useState('');
   const [expirationDate, setExpirationDate] = useState<Date | undefined>(undefined);
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(new Date());
@@ -52,8 +57,8 @@ const AddItem: React.FC = () => {
     setShowCamera(false);
     
     toast({
-      title: "Image Added",
-      description: "Photo has been attached to this item"
+      title: t('addItem.imageAdded'),
+      description: t('addItem.imageAttached')
     });
   };
   
@@ -84,8 +89,26 @@ const AddItem: React.FC = () => {
     });
     
     if (success) {
+      toast({
+        title: t('addItem.form.success'),
+        description: name
+      });
       navigate('/');
+    } else {
+      toast({
+        title: t('addItem.form.error'),
+        variant: "destructive"
+      });
     }
+  };
+  
+  // Format date for display
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat(navigator.language, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
   };
   
   return (
@@ -95,7 +118,8 @@ const AddItem: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-medium mb-6">Add Pantry Item</h1>
+        <h1 className="text-3xl font-medium mb-2">{t('addItem.title')}</h1>
+        <p className="text-muted-foreground mb-6">{t('addItem.subtitle')}</p>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-4">
@@ -104,7 +128,7 @@ const AddItem: React.FC = () => {
               <div className="relative bg-muted rounded-lg overflow-hidden">
                 <img 
                   src={getImage(imageId) || ''} 
-                  alt="Item" 
+                  alt={t('addItem.form.itemImage')} 
                   className="w-full h-auto object-contain max-h-64"
                 />
                 <Button
@@ -128,13 +152,13 @@ const AddItem: React.FC = () => {
             
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
-                Item Name <span className="text-destructive">*</span>
+                {t('addItem.form.nameLabel')} <span className="text-destructive">*</span>
               </label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter item name"
+                placeholder={t('addItem.form.namePlaceholder')}
                 required
               />
             </div>
@@ -142,7 +166,7 @@ const AddItem: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="quantity" className="text-sm font-medium">
-                  Quantity
+                  {t('addItem.form.quantityLabel')}
                 </label>
                 <Input
                   id="quantity"
@@ -155,20 +179,29 @@ const AddItem: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <label htmlFor="unit" className="text-sm font-medium">
-                  Unit
+                  {t('addItem.form.unitLabel')}
                 </label>
-                <Input
-                  id="unit"
+                <Select
                   value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  placeholder="e.g., pack, bottle, lb"
-                />
+                  onValueChange={setUnit}
+                >
+                  <SelectTrigger id="unit">
+                    <SelectValue placeholder={t('addItem.form.unitLabel')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={t('addItem.form.unitItem')}>{t('addItem.form.unitItem')}</SelectItem>
+                    <SelectItem value={t('addItem.form.unitPack')}>{t('addItem.form.unitPack')}</SelectItem>
+                    <SelectItem value={t('addItem.form.unitKg')}>{t('addItem.form.unitKg')}</SelectItem>
+                    <SelectItem value={t('addItem.form.unitLiter')}>{t('addItem.form.unitLiter')}</SelectItem>
+                    <SelectItem value={t('addItem.form.unitOther')}>{t('addItem.form.unitOther')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
             <div className="space-y-2">
               <label htmlFor="category" className="text-sm font-medium">
-                Category <span className="text-destructive">*</span>
+                {t('addItem.form.categoryLabel')} <span className="text-destructive">*</span>
               </label>
               <Select
                 value={categoryId}
@@ -176,12 +209,12 @@ const AddItem: React.FC = () => {
                 required
               >
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t('addItem.form.categoryPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name}
+                      {translateCategory(t, category.id)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,7 +223,7 @@ const AddItem: React.FC = () => {
             
             <div className="space-y-2">
               <label htmlFor="expiration-date" className="text-sm font-medium">
-                Expiration Date
+                {t('addItem.form.expirationLabel')}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -203,10 +236,14 @@ const AddItem: React.FC = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {expirationDate ? format(expirationDate, "PPP") : "Select expiration date"}
+                    {expirationDate ? (
+                      formatDate(expirationDate)
+                    ) : (
+                      <span>{t('addItem.form.expirationPlaceholder')}</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
                     selected={expirationDate}
@@ -219,7 +256,7 @@ const AddItem: React.FC = () => {
             
             <div className="space-y-2">
               <label htmlFor="purchase-date" className="text-sm font-medium">
-                Purchase Date
+                {t('addItem.form.purchaseDateLabel')}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -232,10 +269,14 @@ const AddItem: React.FC = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {purchaseDate ? format(purchaseDate, "PPP") : "Select purchase date"}
+                    {purchaseDate ? (
+                      formatDate(purchaseDate)
+                    ) : (
+                      <span>{t('addItem.form.purchaseDatePlaceholder')}</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
                     selected={purchaseDate}
@@ -248,61 +289,44 @@ const AddItem: React.FC = () => {
             
             <div className="space-y-2">
               <label htmlFor="notes" className="text-sm font-medium">
-                Notes
+                {t('addItem.form.notesLabel')}
               </label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add any additional notes here"
-                rows={3}
+                placeholder={t('addItem.form.notesPlaceholder')}
+                className="min-h-[100px]"
               />
             </div>
-            
-            {!showCamera && !imageId && (
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  onClick={() => {
-                    toast({
-                      title: "Coming Soon",
-                      description: "Barcode scanning will be available in a future update",
-                    });
-                  }}
-                >
-                  <Scan className="h-4 w-4" />
-                  <span>Scan Barcode</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  onClick={() => setShowCamera(true)}
-                >
-                  <ImageIcon className="h-4 w-4" />
-                  <span>Add Photo</span>
-                </Button>
-              </div>
-            )}
           </div>
           
-          <div className="flex gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={() => navigate('/')}
+          <div className="flex flex-col sm:flex-row gap-2 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="flex-1 gap-2"
+              onClick={() => setShowCamera(!showCamera)}
             >
-              Cancel
+              {showCamera ? (
+                <>
+                  <X className="h-4 w-4" />
+                  <span>{t('addItem.form.cancelPhoto')}</span>
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="h-4 w-4" />
+                  <span>{t('addItem.form.takePhoto')}</span>
+                </>
+              )}
             </Button>
-            <Button
-              type="submit"
-              className="flex-1"
+            
+            <Button 
+              type="submit" 
+              className="flex-1 gap-2"
               disabled={!isFormValid}
             >
-              Add Item
+              <span>{t('addItem.form.submit')}</span>
             </Button>
           </div>
         </form>

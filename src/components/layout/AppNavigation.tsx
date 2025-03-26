@@ -1,18 +1,19 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, ShoppingBag, PlusCircle, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const AppNavigation: React.FC = () => {
   const location = useLocation();
+  const { t } = useTranslation();
   
   const navItems = [
-    { to: '/', label: 'Pantry', icon: Home },
-    { to: '/shopping-list', label: 'Shopping', icon: ShoppingBag },
-    { to: '/add-item', label: 'Add', icon: PlusCircle },
-    { to: '/settings', label: 'Settings', icon: Settings },
+    { to: '/', label: t('navigation.pantry'), icon: Home },
+    { to: '/shopping-list', label: t('navigation.shopping'), icon: ShoppingBag },
+    { to: '/add-item', label: t('navigation.add'), icon: PlusCircle },
+    { to: '/settings', label: t('navigation.settings'), icon: Settings },
   ];
   
   return (
@@ -27,6 +28,7 @@ const AppNavigation: React.FC = () => {
               <NavLink 
                 key={item.to} 
                 to={item.to}
+                
                 className={cn(
                   "relative flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg transition-colors",
                   isActive 
