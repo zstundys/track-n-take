@@ -40,7 +40,7 @@ const AddItem: React.FC = () => {
   // Form state
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [unit, setUnit] = useState(t('addItem.form.unitItem'));
+  const [unit, setUnit] = useState('item');
   const [categoryId, setCategoryId] = useState('');
   const [expirationDate, setExpirationDate] = useState<Date | undefined>(undefined);
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(new Date());
@@ -189,11 +189,11 @@ const AddItem: React.FC = () => {
                     <SelectValue placeholder={t('addItem.form.unitLabel')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={t('addItem.form.unitItem')}>{t('addItem.form.unitItem')}</SelectItem>
-                    <SelectItem value={t('addItem.form.unitPack')}>{t('addItem.form.unitPack')}</SelectItem>
-                    <SelectItem value={t('addItem.form.unitKg')}>{t('addItem.form.unitKg')}</SelectItem>
-                    <SelectItem value={t('addItem.form.unitLiter')}>{t('addItem.form.unitLiter')}</SelectItem>
-                    <SelectItem value={t('addItem.form.unitOther')}>{t('addItem.form.unitOther')}</SelectItem>
+                    <SelectItem value={"item"}>{t('addItem.form.unitItem', { count: quantity }  )}</SelectItem>
+                    <SelectItem value={"pack"}>{t('addItem.form.unitPack', { count: quantity })}</SelectItem>
+                    <SelectItem value={"kg"}>{t('addItem.form.unitKg', { count: quantity })}</SelectItem>
+                    <SelectItem value={"liter"}>{t('addItem.form.unitLiter', { count: quantity })}</SelectItem>
+                    <SelectItem value={"other"}>{t('addItem.form.unitOther', { count: quantity })}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

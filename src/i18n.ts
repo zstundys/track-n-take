@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import ICU from 'i18next-icu';
 
 // Import translations
 import enTranslation from './locales/en/translation.json';
@@ -10,6 +11,8 @@ import ltTranslation from './locales/lt/translation.json';
 i18n
   // Detect user language
   .use(LanguageDetector)
+  // Add ICU format support - must be before initReactI18next
+  .use(new ICU())
   // Pass the i18n instance to react-i18next
   .use(initReactI18next)
   // Initialize i18next

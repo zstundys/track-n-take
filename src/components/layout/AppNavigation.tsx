@@ -17,7 +17,7 @@ const AppNavigation: React.FC = () => {
   ];
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
+    <div className="fixed bottom-0 left-0 right-0 z-50 w-max-content mx-auto">
       <div className="glass p-2 sm:p-3 mx-4 mb-4 rounded-xl sm:rounded-full max-w-sm shadow-lg border sm:mx-auto">
         <nav className="flex justify-around items-center">
           {navItems.map((item) => {

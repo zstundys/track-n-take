@@ -20,8 +20,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     <div className="min-h-screen flex flex-col bg-background relative">
       <main 
         className={cn(
-          "flex-1 container max-w-screen-lg mx-auto px-4 sm:px-6 pb-16 pt-4", 
-          hideNavigation ? "pb-4" : "pb-20",
+          "flex-1 container max-w-screen-lg mx-auto px-4 sm:px-6 pb-32 pt-4", 
+          hideNavigation ? "pb-4" : "pb-32",
           className
         )}
       >
