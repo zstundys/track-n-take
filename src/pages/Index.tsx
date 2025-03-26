@@ -14,9 +14,10 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui-custom/Badge';
 import ItemCard from '@/components/ui-custom/ItemCard';
+import EditItemModal from '@/components/ui-custom/EditItemModal';
 import AppLayout from '@/components/layout/AppLayout';
 import { usePantryItems } from '@/hooks/usePantryItems';
-import { FilterOption, SortOption } from '@/types';
+import { FilterOption, SortOption, PantryItem } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { translateCategory } from '@/utils/categoryTranslation';
@@ -26,6 +27,8 @@ const PantryPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const {
     items,
     categories,
@@ -35,6 +38,8 @@ const PantryPage: React.FC = () => {
     sortBy,
     setSortBy,
     addToShoppingList,
+    updateItem,
+    deleteItem,
   } = usePantryItems();
 
   const filterOptions: { value: FilterOption; label: string }[] = [
@@ -77,6 +82,18 @@ const PantryPage: React.FC = () => {
   // Handle sort change
   const handleSortChange = (value: string) => {
     setSortBy(value as SortOption);
+  };
+
+  // Handle item click to open edit modal
+  const handleItemClick = (item: PantryItem) => {
+    setSelectedItem(item);
+    setIsEditModalOpen(true);
+  };
+
+  // Handle closing the edit modal
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedItem(null);
   };
 
   return (
@@ -182,11 +199,29 @@ const PantryPage: React.FC = () => {
                 item={item}
                 category={getCategoryForItem(item.categoryId)}
                 onAddToShoppingList={() => addToShoppingList(item)}
+                onView={() => handleItemClick(item)}
               />
             ))}
           </div>
         )}
       </motion.div>
+
+      {/* Edit Item Modal */}
+      <EditItemModal
+        item={selectedItem}
+        category={selectedItem ? getCategoryForItem(selectedItem.categoryId) : null}
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onUpdate={updateItem}
+        onAddToShoppingList={addToShoppingList}
+        onDelete={async (item) => {
+          const success = await deleteItem(item);
+          if (success) {
+            handleCloseEditModal();
+          }
+          return success;
+        }}
+      />
     </AppLayout>
   );
 };

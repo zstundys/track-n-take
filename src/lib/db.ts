@@ -2,11 +2,13 @@ import { createRxDatabase, addRxPlugin } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
+import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { pantryItemSchema } from "../types";
 
 // Add plugins
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
+addRxPlugin(RxDBUpdatePlugin);
 
 // Database schema
 const categorySchema = {

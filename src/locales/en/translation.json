@@ -29,6 +29,11 @@
   "pantry.itemCard.today": "Today",
   "pantry.itemCard.quantity": "Quantity",
   "pantry.itemCard.addToShopping": "Add to shopping",
+  "pantry.edit.title": "Edit Item",
+  "pantry.edit.currentAmount": "Current amount",
+  "pantry.edit.emptyWarning": "Item will be marked as finished and added to shopping list",
+  "pantry.edit.updateSuccess": "Item updated successfully",
+  "pantry.edit.deleteConfirmation": "Are you sure you want to delete {name}?",
   
   "shoppingList.title": "Shopping List",
   "shoppingList.stats": "{checked}/{total} {total, plural, =1{item} other{items}} checked",
@@ -126,9 +131,14 @@
   "categories.beverages": "Beverages",
   "categories.other": "Other",
   
+  "common.cancel": "Cancel",
+  "common.save": "Save",
+  "common.add": "Add",
+  "common.delete": "Delete",
+  "common.edit": "Edit",
+  "common.comingSoon": "Coming Soon",
   "common.unknown": "Unknown",
   "common.category": "Category",
-  "common.comingSoon": "Coming Soon",
   "common.notFound.title": "Page not found",
   "common.notFound.description": "The page you are looking for doesn't exist or has been moved.",
   "common.notFound.backHome": "Back to home"
