@@ -1,14 +1,13 @@
-
 // Cache name
 const CACHE_NAME = 'pantry-tracker-v1';
 
 // Files to cache
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/track-n-take/',
+  '/track-n-take/index.html',
+  '/track-n-take/manifest.json',
+  '/track-n-take/icon-192.png',
+  '/track-n-take/icon-512.png'
 ];
 
 // Install service worker
@@ -19,6 +18,9 @@ self.addEventListener('install', (event) => {
       .then((cache) => {
         console.log('Opened cache');
         return cache.addAll(urlsToCache);
+      })
+      .catch(error => {
+        console.error('Failed to cache resources:', error);
       })
   );
 });
@@ -53,13 +55,12 @@ self.addEventListener('fetch', (event) => {
 
             return response;
           }
-        );
-      })
-      .catch(() => {
-        // If both cache and network fail, show a generic fallback
-        if (event.request.url.indexOf('/api/') === -1) {
-          return caches.match('/');
-        }
+        ).catch(() => {
+          // If fetch fails (offline), try to return the cached HTML
+          if (event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('/track-n-take/index.html');
+          }
+        });
       })
   );
 });
@@ -68,9 +69,9 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
+        cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }
