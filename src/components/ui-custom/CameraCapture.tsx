@@ -1,8 +1,9 @@
 import React, { useRef, useState, useCallback } from "react";
 import { Camera, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { assert, cn } from "@/lib/utils";
 import { saveImage } from "@/utils/imageStorage";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CameraCaptureProps {
   onImageCaptured: (imageId: string) => void;
@@ -15,12 +16,17 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
 }) => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showFlash, setShowFlash] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Start camera
   const startCamera = useCallback(async () => {
+    assert(!!videoRef.current, "Video element is not available");
+
     try {
+      setIsCapturing(true);
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment", // Use back camera on mobile
@@ -29,28 +35,21 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
         },
       });
 
+      videoRef.current.srcObject = stream;
       streamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsCapturing(true);
-      }
     } catch (error) {
       console.error("Error accessing camera:", error);
       alert("Could not access camera. Please check permissions and try again.");
     }
   }, []);
-
   // Stop camera
   const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+    assert(!!streamRef.current, "Stream is not available");
+    assert(!!videoRef.current, "Video element is not available");
 
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
+    streamRef.current.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    videoRef.current.srcObject = null;
 
     setIsCapturing(false);
   }, []);
@@ -59,12 +58,19 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
   const captureImage = useCallback(() => {
     if (!videoRef.current) return;
 
+    // Trigger flash animation
+    setShowFlash(true);
+    setTimeout(() => {
+      setShowFlash(false);
+    }, 500);
+
     const canvas = document.createElement("canvas");
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    assert(!!ctx, "Canvas context is not available");
 
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
@@ -149,6 +155,19 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
           </Button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showFlash && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 bg-white z-50 pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       <div className={cn("space-y-4", className)}>
         {previewImage ? (
           <div className="relative bg-black rounded-lg overflow-hidden">
