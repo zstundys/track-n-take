@@ -18,7 +18,7 @@ const AppNavigation: React.FC = () => {
   
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 w-max-content mx-auto">
-      <div className="glass p-2 sm:p-3 mx-4 mb-4 rounded-xl sm:rounded-full max-w-sm shadow-lg border sm:mx-auto">
+      <div className="glass p-2 sm:p-3 mx-4 mb-4 rounded-xl sm:rounded-full max-w-sm shadow-lg border border-border dark:border-border/30 dark:bg-background/80 sm:mx-auto">
         <nav className="flex justify-around items-center">
           {navItems.map((item) => {
             const isActive = location.pathname === item.to;
@@ -32,21 +32,21 @@ const AppNavigation: React.FC = () => {
                 className={cn(
                   "relative flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg transition-colors",
                   isActive 
-                    ? "text-primary" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                    ? "text-primary dark:text-primary-foreground font-medium" 
+                    : "text-muted-foreground dark:text-muted-foreground/80 hover:text-foreground dark:hover:text-foreground hover:bg-secondary/60 dark:hover:bg-secondary/30"
                 )}
               >
                 {isActive && (
                   <motion.span
                     layoutId="navIndicator"
-                    className="absolute inset-0 bg-primary/10 rounded-lg"
+                    className="absolute inset-0 bg-primary/10 dark:bg-primary/20 rounded-lg"
                     initial={false}
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
                 
                 <Icon className="h-5 w-5 sm:h-5 sm:w-5" />
-                <span className="text-xs mt-1">{item.label}</span>
+                <span className="text-xs mt-1 font-medium">{item.label}</span>
               </NavLink>
             );
           })}
