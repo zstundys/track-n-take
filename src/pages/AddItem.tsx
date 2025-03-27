@@ -1,67 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Scan, Image as ImageIcon, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { format } from "date-fns";
+import {
+  Calendar as CalendarIcon,
+  Scan,
+  Image as ImageIcon,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import AppLayout from '@/components/layout/AppLayout';
-import { usePantryItems } from '@/hooks/usePantryItems';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/components/ui/use-toast';
-import CameraCapture from '@/components/ui-custom/CameraCapture';
-import { getImage, deleteImage } from '@/utils/imageStorage';
-import { translateCategory } from '@/utils/categoryTranslation';
+} from "@/components/ui/select";
+import AppLayout from "@/components/layout/AppLayout";
+import { usePantryItems } from "@/hooks/usePantryItems";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
+import CameraCapture from "@/components/ui-custom/CameraCapture";
+import { getImage, deleteImage } from "@/utils/imageStorage";
+import { translateCategory } from "@/utils/categoryTranslation";
 
 const AddItem: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
   const { categories, addItem } = usePantryItems();
-  
+
   // Form state
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [unit, setUnit] = useState('item');
-  const [categoryId, setCategoryId] = useState('');
-  const [expirationDate, setExpirationDate] = useState<Date | undefined>(undefined);
-  const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(new Date());
-  const [notes, setNotes] = useState('');
+  const [unit, setUnit] = useState("item");
+  const [categoryId, setCategoryId] = useState("");
+  const [expirationDate, setExpirationDate] = useState<Date | undefined>(
+    undefined
+  );
+  const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(
+    new Date()
+  );
+  const [notes, setNotes] = useState("");
   const [imageId, setImageId] = useState<string | null>(null);
-  const [showCamera, setShowCamera] = useState(false);
-  
+
   // Form validation
-  const isFormValid = name.trim() !== '' && categoryId !== '';
-  
+  const isFormValid = name.trim() !== "" && categoryId !== "";
+
   // Handle image capture
   const handleImageCaptured = (capturedImageId: string) => {
     setImageId(capturedImageId);
-    setShowCamera(false);
-    
+
     toast({
-      title: t('addItem.imageAdded'),
-      description: t('addItem.imageAttached')
+      title: t("addItem.imageAdded"),
+      description: t("addItem.imageAttached"),
     });
   };
-  
+
   // Remove image
   const handleRemoveImage = () => {
     if (imageId) {
@@ -69,13 +76,13 @@ const AddItem: React.FC = () => {
       setImageId(null);
     }
   };
-  
+
   // Submit form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isFormValid) return;
-    
+
     const success = await addItem({
       name,
       quantity,
@@ -87,30 +94,30 @@ const AddItem: React.FC = () => {
       isFinished: false,
       image: imageId || undefined,
     });
-    
+
     if (success) {
       toast({
-        title: t('addItem.form.success'),
-        description: name
+        title: t("addItem.form.success"),
+        description: name,
       });
-      navigate('/');
+      navigate("/");
     } else {
       toast({
-        title: t('addItem.form.error'),
-        variant: "destructive"
+        title: t("addItem.form.error"),
+        variant: "destructive",
       });
     }
   };
-  
+
   // Format date for display
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat(navigator.language, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     }).format(date);
   };
-  
+
   return (
     <AppLayout>
       <motion.div
@@ -118,17 +125,21 @@ const AddItem: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-medium mb-2">{t('addItem.title')}</h1>
-        <p className="text-muted-foreground mb-6">{t('addItem.subtitle')}</p>
-        
+        <h1 className="text-3xl font-medium mb-2">{t("addItem.title")}</h1>
+        <p className="text-muted-foreground mb-6">{t("addItem.subtitle")}</p>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-4">
+            <div className="space-y-2">
+              <CameraCapture onImageCaptured={handleImageCaptured} />
+            </div>
+
             {/* Image preview (if an image is selected) */}
             {imageId && (
               <div className="relative bg-muted rounded-lg overflow-hidden">
-                <img 
-                  src={getImage(imageId) || ''} 
-                  alt={t('addItem.form.itemImage')} 
+                <img
+                  src={getImage(imageId) || ""}
+                  alt={t("addItem.form.itemImage")}
                   className="w-full h-auto object-contain max-h-64"
                 />
                 <Button
@@ -142,31 +153,25 @@ const AddItem: React.FC = () => {
                 </Button>
               </div>
             )}
-            
-            {/* Camera capture component */}
-            {showCamera && (
-              <div className="space-y-2">
-                <CameraCapture onImageCaptured={handleImageCaptured} />
-              </div>
-            )}
-            
+
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
-                {t('addItem.form.nameLabel')} <span className="text-destructive">*</span>
+                {t("addItem.form.nameLabel")}{" "}
+                <span className="text-destructive">*</span>
               </label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={t('addItem.form.namePlaceholder')}
+                placeholder={t("addItem.form.namePlaceholder")}
                 required
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="quantity" className="text-sm font-medium">
-                  {t('addItem.form.quantityLabel')}
+                  {t("addItem.form.quantityLabel")}
                 </label>
                 <Input
                   id="quantity"
@@ -179,37 +184,43 @@ const AddItem: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <label htmlFor="unit" className="text-sm font-medium">
-                  {t('addItem.form.unitLabel')}
+                  {t("addItem.form.unitLabel")}
                 </label>
-                <Select
-                  value={unit}
-                  onValueChange={setUnit}
-                >
+                <Select value={unit} onValueChange={setUnit}>
                   <SelectTrigger id="unit">
-                    <SelectValue placeholder={t('addItem.form.unitLabel')} />
+                    <SelectValue placeholder={t("addItem.form.unitLabel")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={"item"}>{t('addItem.form.unitItem', { count: quantity }  )}</SelectItem>
-                    <SelectItem value={"pack"}>{t('addItem.form.unitPack', { count: quantity })}</SelectItem>
-                    <SelectItem value={"kg"}>{t('addItem.form.unitKg', { count: quantity })}</SelectItem>
-                    <SelectItem value={"liter"}>{t('addItem.form.unitLiter', { count: quantity })}</SelectItem>
-                    <SelectItem value={"other"}>{t('addItem.form.unitOther', { count: quantity })}</SelectItem>
+                    <SelectItem value={"item"}>
+                      {t("addItem.form.unitItem", { count: quantity })}
+                    </SelectItem>
+                    <SelectItem value={"pack"}>
+                      {t("addItem.form.unitPack", { count: quantity })}
+                    </SelectItem>
+                    <SelectItem value={"kg"}>
+                      {t("addItem.form.unitKg", { count: quantity })}
+                    </SelectItem>
+                    <SelectItem value={"liter"}>
+                      {t("addItem.form.unitLiter", { count: quantity })}
+                    </SelectItem>
+                    <SelectItem value={"other"}>
+                      {t("addItem.form.unitOther", { count: quantity })}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="category" className="text-sm font-medium">
-                {t('addItem.form.categoryLabel')} <span className="text-destructive">*</span>
+                {t("addItem.form.categoryLabel")}{" "}
+                <span className="text-destructive">*</span>
               </label>
-              <Select
-                value={categoryId}
-                onValueChange={setCategoryId}
-                required
-              >
+              <Select value={categoryId} onValueChange={setCategoryId} required>
                 <SelectTrigger id="category">
-                  <SelectValue placeholder={t('addItem.form.categoryPlaceholder')} />
+                  <SelectValue
+                    placeholder={t("addItem.form.categoryPlaceholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
@@ -220,10 +231,10 @@ const AddItem: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="expiration-date" className="text-sm font-medium">
-                {t('addItem.form.expirationLabel')}
+                {t("addItem.form.expirationLabel")}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -239,7 +250,7 @@ const AddItem: React.FC = () => {
                     {expirationDate ? (
                       formatDate(expirationDate)
                     ) : (
-                      <span>{t('addItem.form.expirationPlaceholder')}</span>
+                      <span>{t("addItem.form.expirationPlaceholder")}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -253,10 +264,10 @@ const AddItem: React.FC = () => {
                 </PopoverContent>
               </Popover>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="purchase-date" className="text-sm font-medium">
-                {t('addItem.form.purchaseDateLabel')}
+                {t("addItem.form.purchaseDateLabel")}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -272,7 +283,7 @@ const AddItem: React.FC = () => {
                     {purchaseDate ? (
                       formatDate(purchaseDate)
                     ) : (
-                      <span>{t('addItem.form.purchaseDatePlaceholder')}</span>
+                      <span>{t("addItem.form.purchaseDatePlaceholder")}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -286,47 +297,28 @@ const AddItem: React.FC = () => {
                 </PopoverContent>
               </Popover>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="notes" className="text-sm font-medium">
-                {t('addItem.form.notesLabel')}
+                {t("addItem.form.notesLabel")}
               </label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={t('addItem.form.notesPlaceholder')}
+                placeholder={t("addItem.form.notesPlaceholder")}
                 className="min-h-[100px]"
               />
             </div>
           </div>
-          
-          <div className="flex flex-col sm:flex-row gap-2 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="flex-1 gap-2"
-              onClick={() => setShowCamera(!showCamera)}
-            >
-              {showCamera ? (
-                <>
-                  <X className="h-4 w-4" />
-                  <span>{t('addItem.form.cancelPhoto')}</span>
-                </>
-              ) : (
-                <>
-                  <ImageIcon className="h-4 w-4" />
-                  <span>{t('addItem.form.takePhoto')}</span>
-                </>
-              )}
-            </Button>
-            
-            <Button 
-              type="submit" 
-              className="flex-1 gap-2"
+
+          <div className="flex flex-col sm:flex-row gap-2 pt-4 sticky bottom-32 w-fit mx-auto">
+            <Button
+              type="submit"
+              className="flex-1 gap-2 shadow-lg shadow-green-300 rounded-full px-8"
               disabled={!isFormValid}
             >
-              <span>{t('addItem.form.submit')}</span>
+              <span>{t("addItem.form.submit")}</span>
             </Button>
           </div>
         </form>

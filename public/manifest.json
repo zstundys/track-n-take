@@ -1,24 +1,30 @@
-
 {
-  "name": "Pantry Tracker",
-  "short_name": "Pantry",
-  "description": "Track your pantry items and manage your shopping list",
-  "start_url": "/",
-  "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "categories": ["productivity", "shopping"],
+  "description": "Track your pantry items and manage your shopping list",
+  "dir": "auto",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "/track-n-take/icon512_rounded.png",
+      "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "purpose": "any",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/track-n-take/icon512_rounded.png",
+      "type": "image/png"
     }
-  ]
+  ],
+  "id": "meal-whispers-app",
+  "lang": "en-US",
+  "name": "Meal Whispers",
+  "orientation": "portrait",
+  "scope": "/track-n-take/",
+  "short_name": "Meal Whispers",
+  "start_url": "/track-n-take/",
+  "theme_color": "#4b662c"
 }
