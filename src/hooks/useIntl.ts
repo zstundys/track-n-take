@@ -3,7 +3,12 @@ import { useTranslation } from "react-i18next";
 
 type DateTimeFormatOptions = Intl.DateTimeFormatOptions;
 
-export function useIntl() {
+type Result = {
+  /** @example "Jan 1, 2023, 12:00 AM" */
+  longDate: Intl.DateTimeFormat;
+};
+
+export function useIntl(): Result {
   const { i18n } = useTranslation();
 
   const instanceLongDate = useMemo(

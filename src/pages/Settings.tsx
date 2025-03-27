@@ -28,10 +28,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import LanguageSelector from "@/components/language-selector";
+import { APP_VERSION, APP_VERSION_DATE } from "@/lib/version";
+import { useIntl } from "@/hooks/useIntl";
 
 const Settings: React.FC = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { longDate } = useIntl();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -251,7 +254,11 @@ const Settings: React.FC = () => {
                     {t("settings.about.versionDescription")}
                   </p>
                 </div>
-                <Badge variant="outline">v1.0.0</Badge>
+                <div className="space-x-0.5">
+                  <Badge variant="outline">v{APP_VERSION}</Badge>
+                  {" · "}
+                  {longDate.format(APP_VERSION_DATE)}
+                </div>
               </div>
 
               <div className="flex items-center justify-between">

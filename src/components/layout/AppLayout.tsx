@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import AppNavigation from "./AppNavigation";
 import { cn } from "@/lib/utils";
 import { APP_VERSION, APP_VERSION_DATE } from "@/lib/version";
-import { useFormattedDateTime } from "@/hooks/useFormattedDateTime";
+import { useIntl } from "@/hooks/useIntl";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -18,8 +18,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   hideNavigation = false,
   className,
 }) => {
-  const { formatDate } = useFormattedDateTime();
-  const formattedDate = formatDate(APP_VERSION_DATE);
+  const { longDate } = useIntl();
+  const formattedDate = longDate.format(APP_VERSION_DATE);
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative">
@@ -45,7 +45,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       {!hideNavigation && <AppNavigation />}
 
       <div className="absolute bottom-0 right-0 p-2 text-xs text-muted-foreground opacity-70">
-        v{APP_VERSION} • {formattedDate}
+        v{APP_VERSION}
       </div>
     </div>
   );
