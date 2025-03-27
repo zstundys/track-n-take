@@ -130,9 +130,11 @@ const AddItem: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-4">
-            <div className="space-y-2">
-              <CameraCapture onImageCaptured={handleImageCaptured} />
-            </div>
+            {!imageId && (
+              <div className="space-y-2">
+                <CameraCapture onImageCaptured={handleImageCaptured} />
+              </div>
+            )}
 
             {/* Image preview (if an image is selected) */}
             {imageId && (

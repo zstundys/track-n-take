@@ -1,0 +1,19 @@
+:global(html) {
+    interpolate-size: allow-keywords;
+
+}
+
+.viewer {
+    transition-behavior: allow-discrete, allow-keywords;
+    transition-property: all;
+    transition-duration: 700ms;
+    transition-delay: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    height: 0;
+    overflow: clip;
+}
+
+.viewer.open {
+    opacity: 1;
+    height: auto;
+}

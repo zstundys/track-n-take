@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { assert, cn } from "@/lib/utils";
 import { saveImage } from "@/utils/imageStorage";
 import { motion, AnimatePresence } from "framer-motion";
+import styles from "./CameraCapture.module.css";
 
 interface CameraCaptureProps {
   onImageCaptured: (imageId: string) => void;
@@ -47,11 +48,13 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     assert(!!streamRef.current, "Stream is not available");
     assert(!!videoRef.current, "Video element is not available");
 
-    streamRef.current.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-    videoRef.current.srcObject = null;
-
     setIsCapturing(false);
+
+    setTimeout(() => {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      videoRef.current.srcObject = null;
+    }, 800); // Allow time for close animation;
   }, []);
 
   // Capture image
@@ -119,14 +122,16 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     setPreviewImage(null);
     if (isCapturing) {
       stopCamera();
+    } else {
+      startCamera();
     }
-  }, [isCapturing, stopCamera]);
+  }, [isCapturing, stopCamera, startCamera]);
 
   return (
     <>
       <div
-        className={`relative bg-black rounded-lg overflow-hidden ${
-          isCapturing ? "" : "hidden"
+        className={`relative bg-black rounded-lg ${styles.viewer} ${
+          isCapturing || previewImage ? styles.open : ""
         }`}
       >
         <video
@@ -136,25 +141,75 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
           className="w-full h-full aspect-video object-cover"
         />
 
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 gap-2 bg-gradient-to-t from-black/80 to-transparent">
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={stopCamera}
-            className="rounded-full"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="default"
-            size="icon"
-            onClick={captureImage}
-            className="rounded-full"
-          >
-            <Camera className="h-5 w-5" />
-          </Button>
-        </div>
+        {!previewImage && (
+          <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 gap-2 bg-gradient-to-t from-black/80 to-transparent">
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={stopCamera}
+              className="rounded-full"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="default"
+              size="icon"
+              onClick={captureImage}
+              className="rounded-full"
+            >
+              <Camera className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+
+        {previewImage ? (
+          <div className={cn("space-y-4 absolute inset-0", className)}>
+            <div className="relative bg-black rounded-lg overflow-hidden">
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="w-full h-full aspect-video object-contain"
+              />
+
+              <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 gap-2 bg-gradient-to-t from-black/80 to-transparent">
+                <Button variant="destructive" size="sm" onClick={cancelCapture}>
+                  Cancel
+                </Button>
+                <Button variant="default" size="sm" onClick={saveCapture}>
+                  Use Photo
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
+
+      {!previewImage && (
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 gap-2"
+            onClick={startCamera}
+          >
+            <Camera className="h-4 w-4" />
+            <span>Take Photo</span>
+          </Button>
+
+          <div className="relative flex-1">
+            <Button type="button" variant="outline" className="w-full gap-2">
+              <ImageIcon className="h-4 w-4" />
+              <span>Upload Image</span>
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={handleFileUpload}
+            />
+          </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {showFlash && (
@@ -167,52 +222,6 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
           />
         )}
       </AnimatePresence>
-
-      <div className={cn("space-y-4", className)}>
-        {previewImage ? (
-          <div className="relative bg-black rounded-lg overflow-hidden">
-            <img
-              src={previewImage}
-              alt="Preview"
-              className="w-full h-full aspect-video object-contain"
-            />
-
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 gap-2 bg-gradient-to-t from-black/80 to-transparent">
-              <Button variant="destructive" size="sm" onClick={cancelCapture}>
-                Cancel
-              </Button>
-              <Button variant="default" size="sm" onClick={saveCapture}>
-                Use Photo
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1 gap-2"
-              onClick={startCamera}
-            >
-              <Camera className="h-4 w-4" />
-              <span>Take Photo</span>
-            </Button>
-
-            <div className="relative flex-1">
-              <Button type="button" variant="outline" className="w-full gap-2">
-                <ImageIcon className="h-4 w-4" />
-                <span>Upload Image</span>
-              </Button>
-              <input
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={handleFileUpload}
-              />
-            </div>
-          </div>
-        )}
-      </div>
     </>
   );
 };
