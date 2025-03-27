@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Badge } from "./Badge";
 import { cn } from "@/lib/utils";
-import { PantryItem, Category } from "@/types";
+import { PantryItem, Category, translateUnit } from "@/types";
 import {
   AlertCircle,
   Check,
@@ -44,7 +44,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
       return (
         <Badge variant="gray" className="gap-1" animated>
           <Archive className="h-3 w-3" />
-          <span>{t('pantry.filter.finished')}</span>
+          <span>{t("pantry.filter.finished")}</span>
         </Badge>
       );
     }
@@ -53,7 +53,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
       return (
         <Badge variant="destructive" className="gap-1" animated>
           <AlertCircle className="h-3 w-3" />
-          <span>{t('pantry.itemCard.expired')}</span>
+          <span>{t("pantry.itemCard.expired")}</span>
         </Badge>
       );
     }
@@ -62,7 +62,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
       return (
         <Badge variant="yellow" className="gap-1" animated>
           <AlertTriangle className="h-3 w-3" />
-          <span>{t('pantry.filter.expiring')}</span>
+          <span>{t("pantry.filter.expiring")}</span>
         </Badge>
       );
     }
@@ -87,7 +87,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
     const isToday = expirationDay.getTime() === today.getTime();
 
     if (isToday) {
-      return t('pantry.itemCard.today');
+      return t("pantry.itemCard.today");
     }
 
     if (isExpired) {
@@ -96,21 +96,21 @@ const ItemCard: React.FC<ItemCardProps> = ({
           (today.getTime() - expirationDay.getTime()) / (1000 * 60 * 60 * 24)
         )
       );
-      return t('pantry.itemCard.daysAgo', { count: days });
+      return t("pantry.itemCard.daysAgo", { count: days });
     }
 
     const days = Math.floor(
       (expirationDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
     );
-    return t('pantry.itemCard.daysLeft', { count: days });
+    return t("pantry.itemCard.daysLeft", { count: days });
   };
 
   // Format date using Intl API
   const formatDate = (date: string | number | Date) => {
     return new Intl.DateTimeFormat(i18n.language, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     }).format(new Date(date));
   };
 
@@ -134,19 +134,21 @@ const ItemCard: React.FC<ItemCardProps> = ({
       >
         {itemImage && (
           <div className="w-full h-32 bg-muted">
-            <img 
-              src={itemImage} 
-              alt={item.name} 
+            <img
+              src={itemImage}
+              alt={item.name}
               className="w-full h-full object-cover"
             />
           </div>
         )}
-        
+
         <div className="p-4">
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Badge variant={category.color as any}>{translateCategory(t, category.id)}</Badge>
+                <Badge variant={category.color as any}>
+                  {translateCategory(t, category.id)}
+                </Badge>
                 {getStatusBadge()}
               </div>
               <h3 className="font-medium text-lg">{item.name}</h3>
@@ -170,21 +172,19 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
           <div className="mt-2 text-sm text-muted-foreground">
             <p>
-              {item.quantity} {item.unit}
+              {item.quantity} {translateUnit(t, item.unit)}
             </p>
 
             {item.expirationDate && (
               <div className="text-sm text-muted-foreground mb-2">
-                <span>{t('pantry.itemCard.expires')}: </span>
+                <span>{t("pantry.itemCard.expires")}: </span>
                 <span
                   className={cn(
                     isExpired && "text-destructive",
                     isExpiringSoon && "text-amber-500"
                   )}
                 >
-                  {formatDate(item.expirationDate)}
-                  {" "}
-                  ({getExpirationText()})
+                  {formatDate(item.expirationDate)} ({getExpirationText()})
                 </span>
               </div>
             )}

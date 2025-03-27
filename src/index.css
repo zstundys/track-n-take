@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    overflow-y: scroll;
     --background: 220 33% 98%;
     --foreground: 222 47% 11%;
 

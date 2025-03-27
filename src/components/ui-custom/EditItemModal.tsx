@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { PantryItem, Category } from "@/types";
+import { PantryItem, Category, Unit, translateUnit } from "@/types";
 import { translateCategory } from "@/utils/categoryTranslation";
 import { Badge } from "./Badge";
 import { Minus, Plus, ShoppingCart, Save, Trash2 } from "lucide-react";
@@ -95,13 +95,15 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
   const handleDelete = async () => {
     if (!item || !onDelete) return;
-    
+
     // Show confirmation dialog
-    const confirmMessage = t('pantry.edit.deleteConfirmation', { name: item.name });
+    const confirmMessage = t("pantry.edit.deleteConfirmation", {
+      name: item.name,
+    });
     const isConfirmed = window.confirm(confirmMessage);
-    
+
     if (!isConfirmed) return;
-    
+
     setIsDeleting(true);
     try {
       const success = await onDelete(item.id);
@@ -147,7 +149,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 <Slider
                   value={[quantity]}
                   min={0}
-                  max={100}
+                  max={50}
                   step={1}
                   onValueChange={handleQuantityChange}
                 />
@@ -170,26 +172,23 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
             <div className="text-sm text-muted-foreground">
               <p>
-                {t("pantry.edit.currentAmount")}: {quantity} {item.unit}
+                {t("pantry.edit.currentAmount")}: {quantity}{" "}
+                {translateUnit(t, item.unit)}
               </p>
             </div>
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          {onDelete && (
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="absolute left-4 bottom-4"
-              title={t("common.delete")}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-          
+        <DialogFooter className="flex flex-col-reverse sm:flex-row-reverse gap-2 items-baseline">
+          <Button
+            onClick={handleSave}
+            className="w-full sm:w-auto gap-2"
+            disabled={isUpdating}
+          >
+            <Save className="h-4 w-4" />
+            <span>{t("common.save")}</span>
+          </Button>
+
           <Button
             variant="outline"
             onClick={handleAddToShoppingList}
@@ -200,14 +199,20 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             <span>{t("pantry.itemCard.addToShopping")}</span>
           </Button>
 
-          <Button
-            onClick={handleSave}
-            className="w-full sm:w-auto gap-2"
-            disabled={isUpdating}
-          >
-            <Save className="h-4 w-4" />
-            <span>{t("common.save")}</span>
-          </Button>
+          <div className="grow" />
+
+          {onDelete && (
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              title={t("common.delete")}
+              className="order-last sm:order-none"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
