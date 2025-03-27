@@ -317,7 +317,7 @@ const AddItem: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-2 pt-4 sticky bottom-32 w-fit mx-auto">
             <Button
               type="submit"
-              className="flex-1 gap-2 shadow-lg shadow-green-300 rounded-full px-8"
+              className="flex-1 gap-2 shadow-lg shadow-green-300 rounded-full px-8 backdrop-blur-md"
               disabled={!isFormValid}
             >
               <span>{t("addItem.form.submit")}</span>
