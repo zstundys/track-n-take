@@ -73,10 +73,20 @@ export const pantryItemSchema: RxJsonSchema<PantryItem> = {
   required: ["id", "name", "quantity", "categoryId", "createdAt", "updatedAt"],
 };
 
+export type Color =
+  | "green"
+  | "blue"
+  | "red"
+  | "yellow"
+  | "gray"
+  | "orange"
+  | "purple"
+  | "cyan";
+
 export interface Category {
   id: string;
   name: string;
-  color: string;
+  color: Color;
   icon: string;
   createdAt: number;
 }

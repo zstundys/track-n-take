@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId, ComponentProps } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,14 +34,27 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import CameraCapture from "@/components/ui-custom/CameraCapture";
 import { getImage, deleteImage } from "@/utils/imageStorage";
-import { translateCategory } from "@/utils/categoryTranslation";
+import {
+  translateCategory,
+  getCategoryColorClasses,
+} from "@/utils/category.hooks";
+
+import styles from "./AddItem.module.css";
+import { useIntl } from "@/hooks/useIntl";
+
+const NOW = new Date();
+const THIRTY_DAYS_FROM_NOW = new Date();
+THIRTY_DAYS_FROM_NOW.setDate(NOW.getDate() + 30);
+
+const THIRTY_DAYS_UNTIL_NOW = new Date();
+THIRTY_DAYS_UNTIL_NOW.setDate(NOW.getDate() - 30);
 
 const AddItem: React.FC = () => {
   const navigate = useNavigate();
+  const { shortDate } = useIntl();
   const { toast } = useToast();
   const { t } = useTranslation();
   const { categories, addItem } = usePantryItems();
-
   // Form state
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -107,15 +120,6 @@ const AddItem: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
-
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(date);
   };
 
   return (
@@ -213,92 +217,56 @@ const AddItem: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2" id="terminalSelection">
               <label htmlFor="category" className="text-sm font-medium">
                 {t("addItem.form.categoryLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
-              <Select value={categoryId} onValueChange={setCategoryId} required>
-                <SelectTrigger id="category">
-                  <SelectValue
-                    placeholder={t("addItem.form.categoryPlaceholder")}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {translateCategory(t, category.id)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="expiration-date" className="text-sm font-medium">
-                {t("addItem.form.expirationLabel")}
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="expiration-date"
-                    variant="outline"
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <label
+                    key={category.id}
+                    htmlFor={`category-${category.id}`}
                     className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !expirationDate && "text-muted-foreground"
+                      "flex items-center  justify-center px-3 py-1.5 rounded-full border-2 text-sm font-medium cursor-pointer transition-all",
+                      getCategoryColorClasses(category.color),
+                      category.id === categoryId
+                        ? styles.selectedCategory
+                        : undefined
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {expirationDate ? (
-                      formatDate(expirationDate)
-                    ) : (
-                      <span>{t("addItem.form.expirationPlaceholder")}</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={expirationDate}
-                    onSelect={setExpirationDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+                    <input
+                      type="radio"
+                      name="category"
+                      id={`category-${category.id}`}
+                      value={category.id}
+                      checked={category.id === categoryId}
+                      onChange={() => setCategoryId(category.id)}
+                      className="sr-only"
+                    />
+                    {translateCategory(t, category.id)}
+                  </label>
+                ))}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="purchase-date" className="text-sm font-medium">
-                {t("addItem.form.purchaseDateLabel")}
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="purchase-date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !purchaseDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {purchaseDate ? (
-                      formatDate(purchaseDate)
-                    ) : (
-                      <span>{t("addItem.form.purchaseDatePlaceholder")}</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={purchaseDate}
-                    onSelect={setPurchaseDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+            <DateSelect
+              label={t("addItem.form.expirationLabel")}
+              value={expirationDate}
+              onDateChange={setExpirationDate}
+              placeholder={t("addItem.form.expirationPlaceholder")}
+              fromDate={NOW}
+              toDate={THIRTY_DAYS_FROM_NOW}
+            />
+
+            <DateSelect
+              label={t("addItem.form.purchaseDateLabel")}
+              value={purchaseDate}
+              onDateChange={setPurchaseDate}
+              placeholder={t("addItem.form.purchaseDatePlaceholder")}
+              toDate={NOW}
+              fromDate={THIRTY_DAYS_UNTIL_NOW}
+            />
 
             <div className="space-y-2">
               <label htmlFor="notes" className="text-sm font-medium">
@@ -314,10 +282,10 @@ const AddItem: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 pt-4 sticky bottom-32 w-fit mx-auto">
+          <div className="flex flex-col sm:flex-row gap-2 pt-4 w-fit mx-auto sticky bottom-32">
             <Button
               type="submit"
-              className="flex-1 gap-2 shadow-lg shadow-green-300 rounded-full px-8 backdrop-blur-md"
+              className="flex-1 gap-2 shadow-lg disabled:shadow-none shadow-green-700 dark:shadow-green-900 rounded-full px-8 relative disabled:bg-primary/40 backdrop-blur-[1px] opacity-[revert!important] "
               disabled={!isFormValid}
             >
               <span>{t("addItem.form.submit")}</span>
@@ -329,4 +297,60 @@ const AddItem: React.FC = () => {
   );
 };
 
+type DateSelectProps = {
+  label: string;
+  value: Date | undefined;
+  onDateChange: (date: Date | undefined) => void;
+  placeholder: string;
+} & Pick<ComponentProps<typeof Calendar>, "toDate" | "fromDate">;
+
+const DateSelect: React.FC<DateSelectProps> = ({
+  label,
+  value,
+  onDateChange,
+  placeholder,
+  toDate,
+  fromDate,
+}) => {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const { shortDate } = useIntl();
+  const htmlId = `date-select-${id}`;
+
+  return (
+    <div className="space-y-2">
+      <label htmlFor={htmlId} className="text-sm font-medium">
+        {label}
+      </label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id={htmlId}
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !value && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {value ? shortDate.format(value) : <span>{placeholder}</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={value}
+            fromDate={fromDate}
+            toDate={toDate}
+            onSelect={(date) => {
+              setOpen(false);
+              onDateChange(date);
+            }}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
 export default AddItem;

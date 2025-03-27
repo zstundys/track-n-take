@@ -1,0 +1,4 @@
+div:has(> .selectedCategory)>*:not(.selectedCategory) {
+
+    opacity: 0.3;
+}

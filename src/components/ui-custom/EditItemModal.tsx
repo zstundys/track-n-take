@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { PantryItem, Category, Unit, translateUnit } from "@/types";
-import { translateCategory } from "@/utils/categoryTranslation";
+import { translateCategory } from "@/utils/category.hooks";
 import { Badge } from "./Badge";
 import { Minus, Plus, ShoppingCart, Save, Trash2 } from "lucide-react";
 

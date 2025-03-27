@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -31,12 +31,32 @@ import LanguageSelector from "@/components/language-selector";
 import { APP_VERSION, APP_VERSION_DATE } from "@/lib/version";
 import { useIntl } from "@/hooks/useIntl";
 
+const THEME_KEY = "pantry-theme-preference";
+
 const Settings: React.FC = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { longDate } = useIntl();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Load theme preference from localStorage on component mount
+  useEffect(() => {
+    const storedTheme = localStorage.getItem(THEME_KEY);
+    const isDark =
+      storedTheme === "dark" ||
+      (!storedTheme &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    setIsDarkMode(isDark);
+
+    // Make sure the UI matches the actual state
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
 
   const handleClearData = async () => {
     toast({
@@ -47,16 +67,19 @@ const Settings: React.FC = () => {
   };
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
+    const newDarkModeState = !isDarkMode;
+    setIsDarkMode(newDarkModeState);
 
-    if (!isDarkMode) {
+    if (newDarkModeState) {
       document.documentElement.classList.add("dark");
+      localStorage.setItem(THEME_KEY, "dark");
     } else {
       document.documentElement.classList.remove("dark");
+      localStorage.setItem(THEME_KEY, "light");
     }
 
     toast({
-      title: !isDarkMode ? "Dark Mode Enabled" : "Light Mode Enabled",
+      title: newDarkModeState ? "Dark Mode Enabled" : "Light Mode Enabled",
       description: "Theme preference saved",
     });
   };
@@ -254,10 +277,12 @@ const Settings: React.FC = () => {
                     {t("settings.about.versionDescription")}
                   </p>
                 </div>
-                <div className="space-x-0.5">
-                  <Badge variant="outline">v{APP_VERSION}</Badge>
+                <div className="space-x-0.5 text-muted-foreground">
+                  <span className="text-sm">
+                    {longDate.format(APP_VERSION_DATE)}
+                  </span>
                   {" · "}
-                  {longDate.format(APP_VERSION_DATE)}
+                  <Badge variant="outline">v{APP_VERSION}</Badge>
                 </div>
               </div>
 

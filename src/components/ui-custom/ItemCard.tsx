@@ -13,7 +13,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { getImage } from "@/utils/imageStorage";
-import { translateCategory } from "@/utils/categoryTranslation";
+import { translateCategory } from "@/utils/category.hooks";
 
 interface ItemCardProps {
   item: PantryItem;

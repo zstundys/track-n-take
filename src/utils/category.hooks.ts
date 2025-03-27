@@ -1,3 +1,4 @@
+import { Color } from "@/types";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -30,6 +31,60 @@ export const useTranslateCategory = (categoryId: string): string => {
 
   // If not found, return the ID as a fallback
   return categoryId;
+};
+
+export const getCategoryColorClasses = (color: Color) => {
+  const cLight = (
+    colorCode: string
+  ): { background: string; text: string; border: string } => {
+    return {
+      background: `bg-${colorCode}-200`,
+      text: `text-${colorCode}-800`,
+      border: `border-${colorCode}-300`,
+    };
+  };
+  const cDark = (
+    colorCode: string
+  ): { background: string; text: string; border: string } => {
+    return {
+      background: `bg-${colorCode}-800`,
+      text: `dark:text-${colorCode}-200`,
+      border: `dark:border-${colorCode}-600`,
+    };
+  };
+
+  const colorMapping = {
+    light: {
+      gray: cLight("gray"),
+      blue: cLight("blue"),
+      cyan: cLight("cyan"),
+      green: cLight("green"),
+      orange: cLight("orange"),
+      purple: cLight("purple"),
+      red: cLight("red"),
+      yellow: cLight("yellow"),
+    } satisfies Record<
+      Color,
+      { background: string; text: string; border: string }
+    >,
+    dark: {
+      gray: cDark("slate"),
+      blue: cDark("blue"),
+      cyan: cDark("cyan"),
+      green: cDark("green"),
+      orange: cDark("orange"),
+      purple: cDark("purple"),
+      red: cDark("red"),
+      yellow: cDark("yellow"),
+    } satisfies Record<
+      Color,
+      { background: string; text: string; border: string }
+    >,
+  };
+
+  return `${Object.values(colorMapping.light[color]).join(" ")} ${Object.values(
+    colorMapping.dark[color]
+  ).join(" ")}`;
 };
 
 /**

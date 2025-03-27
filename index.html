@@ -10,7 +10,21 @@
   <meta name="description" content="A platform for tracking food items in your pantry." />
   <meta name="author" content="Meal Whispers" />
   <meta property="og:image" content="/og-image.png" />
+  <!-- Apply dark mode immediately to prevent flicker -->
+  <script>
+    (function () {
+      var themeKey = "pantry-theme-preference";
+      var storedTheme = localStorage.getItem(themeKey);
+      var isDark = storedTheme === 'dark' ||
+        (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
   <link
     href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
     rel="stylesheet">

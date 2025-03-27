@@ -27,7 +27,7 @@ import { usePantryItems } from "@/hooks/usePantryItems";
 import { FilterOption, SortOption, PantryItem } from "@/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
-import { translateCategory } from "@/utils/categoryTranslation";
+import { translateCategory } from "@/utils/category.hooks";
 
 const PantryPage: React.FC = () => {
   const { toast } = useToast();
