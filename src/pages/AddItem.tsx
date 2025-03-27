@@ -259,6 +259,8 @@ const AddItem: React.FC = () => {
               toDate={THIRTY_DAYS_FROM_NOW}
             />
 
+            <span className="dark:bg-green-800"></span>
+
             <DateSelect
               label={t("addItem.form.purchaseDateLabel")}
               value={purchaseDate}

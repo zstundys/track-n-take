@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 const languages = [
   { value: "en", label: "English" },
-  { value: "lt", label: "Lithuanian" },
+  { value: "lt", label: "Lietuvių" },
 ];
 
 const LanguageSelector: React.FC = () => {

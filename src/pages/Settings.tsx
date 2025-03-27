@@ -77,11 +77,6 @@ const Settings: React.FC = () => {
       document.documentElement.classList.remove("dark");
       localStorage.setItem(THEME_KEY, "light");
     }
-
-    toast({
-      title: newDarkModeState ? "Dark Mode Enabled" : "Light Mode Enabled",
-      description: "Theme preference saved",
-    });
   };
 
   return (
