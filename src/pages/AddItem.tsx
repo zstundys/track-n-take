@@ -171,6 +171,7 @@ const AddItem: React.FC = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("addItem.form.namePlaceholder")}
                 required
+                autoFocus
               />
             </div>
 
