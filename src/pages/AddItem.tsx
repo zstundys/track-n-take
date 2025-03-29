@@ -168,7 +168,7 @@ const AddItem: React.FC = () => {
                 <img
                   src={getImage(imageId) || ""}
                   alt={t("addItem.form.itemImage")}
-                  className="relative w-full h-auto object-contain max-h-64"
+                  className="relative w-full h-auto object-contain max-h-96"
                 />
                 <Button
                   type="button"
