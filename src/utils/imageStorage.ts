@@ -94,6 +94,17 @@ export const getImage = (imageId: string): string | null => {
   return sessionStorage.getItem(imageId);
 };
 
+export const getImageAsBlob = (imageId: string): Blob | null => {
+  const dataURL = sessionStorage.getItem(imageId);
+  if (!dataURL) return null;
+
+  try {
+    return dataURLToBlob(dataURL);
+  } catch (error) {
+    console.error("Error converting image to blob:", error);
+    return null;
+  }
+};
 // Delete image from local storage
 export const deleteImage = (imageId: string): boolean => {
   if (sessionStorage.getItem(imageId)) {

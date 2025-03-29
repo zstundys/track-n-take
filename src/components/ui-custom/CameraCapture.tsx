@@ -5,6 +5,7 @@ import { assert, cn } from "@/lib/utils";
 import { saveImage } from "@/utils/imageStorage";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./CameraCapture.module.css";
+import { useImageRecognizerWorker } from "@/hooks/use-image-recognizer-worker";
 
 interface CameraCaptureProps {
   onImageCaptured: (imageId: string) => void;
@@ -39,6 +40,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
       videoRef.current.srcObject = stream;
       streamRef.current = stream;
     } catch (error) {
+      setIsCapturing(false);
       console.error("Error accessing camera:", error);
       alert("Could not access camera. Please check permissions and try again.");
     }
@@ -51,9 +53,14 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     setIsCapturing(false);
 
     setTimeout(() => {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-      videoRef.current.srcObject = null;
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
     }, 800); // Allow time for close animation;
   }, []);
 

@@ -3,7 +3,6 @@
   "navigation.shopping": "Pirkiniai",
   "navigation.add": "Pridėti",
   "navigation.settings": "Nustatymai",
-
   "pantry.title": "Mano sandėliukas",
   "pantry.itemCount": "{count, plural, =0{Nėra produktų} one{1 produktas} few{# produktai} other{# produktų}}",
   "pantry.search": "Ieškoti produktų...",
@@ -34,7 +33,6 @@
   "pantry.edit.emptyWarning": "Produktas bus pažymėtas kaip baigtas ir pridėtas į pirkinių sąrašą",
   "pantry.edit.updateSuccess": "Produktas sėkmingai atnaujintas",
   "pantry.edit.deleteConfirmation": "Ar tikrai norite ištrinti {name}?",
-
   "shoppingList.title": "Pirkinių sąrašas",
   "shoppingList.stats": "{checked}/{total} {total, plural, =1{prekė} few{prekės} other{prekių}} pažymėta",
   "shoppingList.search": "Ieškoti prekių...",
@@ -58,7 +56,6 @@
   "shoppingList.addDialog.categoryPlaceholder": "Pasirinkite kategoriją",
   "shoppingList.addDialog.cancel": "Atšaukti",
   "shoppingList.addDialog.add": "Pridėti prekę",
-
   "addItem.title": "Pridėti prekę",
   "addItem.subtitle": "Pridėti naują prekę į sandėliuką",
   "addItem.imageAdded": "Nuotrauka pridėta",
@@ -86,7 +83,6 @@
   "addItem.form.submit": "Pridėti į sandėliuką",
   "addItem.form.success": "Prekė pridėta į sandėliuką",
   "addItem.form.error": "Nepavyko pridėti prekės",
-
   "settings.title": "Nustatymai",
   "settings.subtitle": "Tvarkykite savo nuostatas ir programos duomenis",
   "settings.appearance.title": "Išvaizda",
@@ -120,9 +116,8 @@
   "settings.deleteDialog.description": "Šio veiksmo negalima atšaukti. Tai visam laikui ištrins visus jūsų sandėlio elementus, apsipirkimo sąrašus ir nustatymus.",
   "settings.deleteDialog.cancel": "Atšaukti",
   "settings.deleteDialog.confirm": "Ištrinti viską",
-
   "categories.fruitsVegetables": "Vaisiai ir daržovės",
-  "categories.dairy": "Pieno produktai",
+  "categories.dairy": "Pieno produktai ir kiaušiniai",
   "categories.meatFish": "Mėsa ir žuvis",
   "categories.grains": "Grūdai ir makaronai",
   "categories.cannedGoods": "Konservuoti produktai",
@@ -130,7 +125,6 @@
   "categories.snacks": "Užkandžiai",
   "categories.beverages": "Gėrimai",
   "categories.other": "Kita",
-
   "common.cancel": "Atšaukti",
   "common.save": "Išsaugoti",
   "common.add": "Pridėti",
@@ -141,5 +135,6 @@
   "common.category": "Kategorija",
   "common.notFound.title": "Puslapis nerastas",
   "common.notFound.description": "Puslapis, kurio ieškote, neegzistuoja arba buvo perkeltas.",
-  "common.notFound.backHome": "Grįžti į pradžią"
+  "common.notFound.backHome": "Grįžti į pradžią",
+  "confirm.autoFill": "Galim naudoti DI užpildyti visiems likusiems laukams. Tęsti?"
 }

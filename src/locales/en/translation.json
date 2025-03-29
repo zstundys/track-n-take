@@ -3,7 +3,6 @@
   "navigation.shopping": "Shopping",
   "navigation.add": "Add",
   "navigation.settings": "Settings",
-  
   "pantry.title": "My Pantry",
   "pantry.itemCount": "{count, plural, =0{No items in your pantry} one{1 item in your pantry} other{# items in your pantry}}",
   "pantry.search": "Search items...",
@@ -34,7 +33,6 @@
   "pantry.edit.emptyWarning": "Item will be marked as finished and added to shopping list",
   "pantry.edit.updateSuccess": "Item updated successfully",
   "pantry.edit.deleteConfirmation": "Are you sure you want to delete {name}?",
-  
   "shoppingList.title": "Shopping List",
   "shoppingList.stats": "{checked}/{total} {total, plural, =1{item} other{items}} checked",
   "shoppingList.search": "Search items...",
@@ -58,7 +56,6 @@
   "shoppingList.addDialog.categoryPlaceholder": "Select a category",
   "shoppingList.addDialog.cancel": "Cancel",
   "shoppingList.addDialog.add": "Add item",
-  
   "addItem.title": "Add Item",
   "addItem.subtitle": "Add a new item to your pantry",
   "addItem.imageAdded": "Image added",
@@ -86,7 +83,6 @@
   "addItem.form.submit": "Add to pantry",
   "addItem.form.success": "Item added to pantry",
   "addItem.form.error": "Failed to add item",
-  
   "settings.title": "Settings",
   "settings.subtitle": "Manage your preferences and app data",
   "settings.appearance.title": "Appearance",
@@ -120,9 +116,8 @@
   "settings.deleteDialog.description": "This action cannot be undone. This will permanently delete all your pantry items, shopping lists, and settings.",
   "settings.deleteDialog.cancel": "Cancel",
   "settings.deleteDialog.confirm": "Delete everything",
-  
   "categories.fruitsVegetables": "Fruits & Vegetables",
-  "categories.dairy": "Dairy",
+  "categories.dairy": "Dairy & Eggs",
   "categories.meatFish": "Meat & Fish",
   "categories.grains": "Grains & Pasta",
   "categories.cannedGoods": "Canned Goods",
@@ -130,7 +125,6 @@
   "categories.snacks": "Snacks",
   "categories.beverages": "Beverages",
   "categories.other": "Other",
-  
   "common.cancel": "Cancel",
   "common.save": "Save",
   "common.add": "Add",
@@ -141,5 +135,6 @@
   "common.category": "Category",
   "common.notFound.title": "Page not found",
   "common.notFound.description": "The page you are looking for doesn't exist or has been moved.",
-  "common.notFound.backHome": "Back to home"
+  "common.notFound.backHome": "Back to home",
+  "confirm.autoFill": "We can use AI to auto-fill the rest of the fields. Proceed?"
 }

@@ -83,6 +83,16 @@ export type Color =
   | "purple"
   | "cyan";
 
+export type CategoryId =
+  | "fruits-vegetables"
+  | "dairy-and-eggs"
+  | "meat-fish"
+  | "grains"
+  | "canned-goods"
+  | "spices"
+  | "snacks"
+  | "beverages"
+  | "other";
 export interface Category {
   id: string;
   name: string;

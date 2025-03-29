@@ -33,7 +33,7 @@ import { usePantryItems } from "@/hooks/usePantryItems";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import CameraCapture from "@/components/ui-custom/CameraCapture";
-import { getImage, deleteImage } from "@/utils/imageStorage";
+import { getImage, deleteImage, getImageAsBlob } from "@/utils/imageStorage";
 import {
   translateCategory,
   getCategoryColorClasses,
@@ -41,6 +41,8 @@ import {
 
 import styles from "./AddItem.module.css";
 import { useIntl } from "@/hooks/useIntl";
+import { useImageRecognizerWorker } from "@/hooks/use-image-recognizer-worker";
+import { CategoryId } from "@/types";
 
 const NOW = new Date();
 const THIRTY_DAYS_FROM_NOW = new Date();
@@ -59,13 +61,14 @@ const AddItem: React.FC = () => {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [unit, setUnit] = useState("item");
-  const [categoryId, setCategoryId] = useState("");
+  const [categoryId, setCategoryId] = useState<CategoryId | "">("");
   const [expirationDate, setExpirationDate] = useState<Date | undefined>(
     undefined
   );
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(
     new Date()
   );
+  const { categorizeImage } = useImageRecognizerWorker();
   const [notes, setNotes] = useState("");
   const [imageId, setImageId] = useState<string | null>(null);
 
@@ -81,6 +84,20 @@ const AddItem: React.FC = () => {
       description: t("addItem.imageAttached"),
     });
   };
+
+  const imageBlob = imageId ? getImageAsBlob(imageId) : undefined;
+
+  useEffect(() => {
+    if (imageBlob) {
+      categorizeImage(imageBlob).then((result) => {
+        if (result) {
+          const bestMatch = result[0].label;
+
+          setCategoryId(bestMatch);
+        }
+      });
+    }
+  });
 
   // Remove image
   const handleRemoveImage = () => {
@@ -145,8 +162,13 @@ const AddItem: React.FC = () => {
               <div className="relative bg-muted rounded-lg overflow-hidden">
                 <img
                   src={getImage(imageId) || ""}
+                  aria-hidden="true"
+                  className="object-cover absolute inset-0 w-full h-full pointer-events-none blur-3xl opacity-30"
+                />
+                <img
+                  src={getImage(imageId) || ""}
                   alt={t("addItem.form.itemImage")}
-                  className="w-full h-auto object-contain max-h-64"
+                  className="relative w-full h-auto object-contain max-h-64"
                 />
                 <Button
                   type="button"

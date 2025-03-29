@@ -1,12 +1,12 @@
-import { Color } from "@/types";
+import { CategoryId, Color } from "@/types";
 import { useTranslation } from "react-i18next";
 
 /**
  * Maps database category IDs to translation keys
  */
-const categoryTranslationMap: Record<string, string> = {
+const categoryTranslationMap: Record<CategoryId, string> = {
   "fruits-vegetables": "categories.fruitsVegetables",
-  dairy: "categories.dairy",
+  "dairy-and-eggs": "categories.dairy",
   "meat-fish": "categories.meatFish",
   grains: "categories.grains",
   "canned-goods": "categories.cannedGoods",

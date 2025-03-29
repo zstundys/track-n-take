@@ -5,7 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function assert(condition: boolean, message: string): asserts condition {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function assert(condition: any, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }

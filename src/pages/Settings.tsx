@@ -16,6 +16,10 @@ import {
   Moon,
   Sun,
   Github,
+  Key,
+  Loader2,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -27,9 +31,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 import LanguageSelector from "@/components/language-selector";
 import { APP_VERSION, APP_VERSION_DATE } from "@/lib/version";
 import { useIntl } from "@/hooks/useIntl";
+import { useImageRecognizerWorker } from "@/hooks/use-image-recognizer-worker";
+import { assert } from "@/lib/utils";
+import { HUGGINGFACE_TOKEN_STORAGE_KEY } from "@/lib/worker-messages";
 
 const THEME_KEY = "pantry-theme-preference";
 
@@ -38,25 +46,17 @@ const Settings: React.FC = () => {
   const { t } = useTranslation();
   const { longDate } = useIntl();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [huggingFaceToken, setHuggingFaceToken] = useState(
+    localStorage.getItem(HUGGINGFACE_TOKEN_STORAGE_KEY) || ""
+  );
 
-  // Load theme preference from localStorage on component mount
-  useEffect(() => {
-    const storedTheme = localStorage.getItem(THEME_KEY);
-    const isDark =
-      storedTheme === "dark" ||
-      (!storedTheme &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+  // Get worker state from hook
+  const { isWorkerReady, isClientValid, clear, isInitializing, validateToken } =
+    useImageRecognizerWorker();
 
-    setIsDarkMode(isDark);
+  console.log("#", { isWorkerReady, isClientValid, isInitializing });
 
-    // Make sure the UI matches the actual state
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
+  const { isDarkMode, toggleDarkMode } = useDarkThemePreference();
 
   const handleClearData = async () => {
     toast({
@@ -66,17 +66,40 @@ const Settings: React.FC = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const toggleDarkMode = () => {
-    const newDarkModeState = !isDarkMode;
-    setIsDarkMode(newDarkModeState);
+  const saveHuggingFaceToken = async () => {
+    try {
+      const isValid = await validateToken(huggingFaceToken);
 
-    if (newDarkModeState) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem(THEME_KEY, "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem(THEME_KEY, "light");
+      assert(isValid, "Invalid token");
+
+      localStorage.setItem(HUGGINGFACE_TOKEN_STORAGE_KEY, huggingFaceToken);
+
+      toast({
+        title: "Token Saved & Validated",
+        description:
+          "Your Hugging Face API token has been saved and validated successfully.",
+      });
+    } catch {
+      localStorage.setItem(HUGGINGFACE_TOKEN_STORAGE_KEY, "");
+      toast({
+        title: "Invalid Token",
+        description:
+          "The token couldn't be validated. Please check and try again.",
+        variant: "destructive",
+      });
     }
+  };
+
+  // Render token status icon
+  const renderTokenStatus = () => {
+    if (isInitializing) {
+      return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
+    } else if (isClientValid === true) {
+      return <CheckCircle className="h-4 w-4 text-green-500" />;
+    } else if (isClientValid === false) {
+      return <XCircle className="h-4 w-4 text-red-500" />;
+    }
+    return null;
   };
 
   return (
@@ -146,6 +169,68 @@ const Settings: React.FC = () => {
                   <LanguageSelector />
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-medium mb-2">API Settings</h2>
+            <Separator className="mb-4" />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">
+                      Hugging Face API Token
+                    </span>
+                    <Badge variant="outline" size="sm">
+                      Required
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Enter your Hugging Face API token to enable image
+                    recognition features
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Input
+                      type="password"
+                      placeholder="hf_..."
+                      value={huggingFaceToken}
+                      onChange={(e) => {
+                        clear();
+                        return setHuggingFaceToken(e.target.value);
+                      }}
+                      className="w-[250px] font-mono pr-8"
+                    />
+                    {huggingFaceToken && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        {renderTokenStatus()}
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={saveHuggingFaceToken}
+                    disabled={isInitializing || !isWorkerReady}
+                  >
+                    {isInitializing ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Key className="h-4 w-4 mr-2" />
+                    )}
+                    {isInitializing ? "Validating..." : "Save & Validate"}
+                  </Button>
+                </div>
+              </div>
+              {!isWorkerReady && (
+                <div className="flex items-center gap-2 text-sm text-amber-500 dark:text-amber-400">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Initializing worker...</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -320,7 +405,6 @@ const Settings: React.FC = () => {
           </div>
         </div>
       </motion.div>
-
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -350,5 +434,43 @@ const Settings: React.FC = () => {
     </AppLayout>
   );
 };
+
+function useDarkThemePreference() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    const storedTheme = localStorage.getItem(THEME_KEY);
+    const isDark =
+      storedTheme === "dark" ||
+      (!storedTheme &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    setIsDarkMode(isDark);
+
+    // Make sure the UI matches the actual state
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkModeState = !isDarkMode;
+    setIsDarkMode(newDarkModeState);
+
+    if (newDarkModeState) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem(THEME_KEY, "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem(THEME_KEY, "light");
+    }
+  };
+
+  return {
+    isDarkMode,
+    toggleDarkMode,
+  };
+}
 
 export default Settings;

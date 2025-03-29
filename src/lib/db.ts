@@ -12,36 +12,44 @@ addRxPlugin(RxDBUpdatePlugin);
 
 // Database schema
 const categorySchema = {
-  title: 'Category Schema',
+  title: "Category Schema",
   version: 0,
-  type: 'object',
-  primaryKey: 'id',
+  type: "object",
+  primaryKey: "id",
   properties: {
-    id: { type: 'string' },
-    name: { type: 'string' },
-    color: { type: 'string' },
-    icon: { type: 'string' },
-    createdAt: { type: 'number' },
+    id: { type: "string" },
+    name: { type: "string" },
+    color: { type: "string" },
+    icon: { type: "string" },
+    createdAt: { type: "number" },
   },
-  required: ['id', 'name', 'color', 'icon', 'createdAt'],
+  required: ["id", "name", "color", "icon", "createdAt"],
 };
 
 const shoppingItemSchema = {
-  title: 'Shopping Item Schema',
+  title: "Shopping Item Schema",
   version: 0,
-  type: 'object',
-  primaryKey: 'id',
+  type: "object",
+  primaryKey: "id",
   properties: {
-    id: { type: 'string' },
-    name: { type: 'string' },
-    quantity: { type: 'number' },
-    unit: { type: 'string' },
-    categoryId: { type: 'string' },
-    isChecked: { type: 'boolean' },
-    fromPantryItemId: { type: ['string', 'null'] },
-    createdAt: { type: 'number' },
+    id: { type: "string" },
+    name: { type: "string" },
+    quantity: { type: "number" },
+    unit: { type: "string" },
+    categoryId: { type: "string" },
+    isChecked: { type: "boolean" },
+    fromPantryItemId: { type: ["string", "null"] },
+    createdAt: { type: "number" },
   },
-  required: ['id', 'name', 'quantity', 'unit', 'categoryId', 'isChecked', 'createdAt'],
+  required: [
+    "id",
+    "name",
+    "quantity",
+    "unit",
+    "categoryId",
+    "isChecked",
+    "createdAt",
+  ],
 };
 
 // Database instance
@@ -51,7 +59,7 @@ export const getDatabase = async () => {
   if (dbPromise) return dbPromise;
 
   dbPromise = createRxDatabase({
-    name: "pantrydb.v2",
+    name: "pantrydb.v3",
     storage: getRxStorageDexie(),
   }).then(async (db) => {
     // Create collections
@@ -97,8 +105,8 @@ const initializeDefaultData = async (db: any) => {
           createdAt: now,
         },
         {
-          id: "dairy",
-          name: "Dairy", // Will be translated when displayed
+          id: "dairy-and-eggs",
+          name: "Dairy & Eggs", // Will be translated when displayed
           color: "blue",
           icon: "milk",
           createdAt: now + 1,
@@ -157,7 +165,7 @@ const initializeDefaultData = async (db: any) => {
       await db.categories.bulkInsert(defaultCategories);
     }
   } catch (error) {
-    console.error('Error initializing default data:', error);
+    console.error("Error initializing default data:", error);
   }
 };
 
