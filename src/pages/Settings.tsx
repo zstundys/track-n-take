@@ -177,7 +177,7 @@ const Settings: React.FC = () => {
             <Separator className="mb-4" />
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">
@@ -192,8 +192,8 @@ const Settings: React.FC = () => {
                     recognition features
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                  <div className="relative flex-shrink">
                     <Input
                       type="password"
                       placeholder="hf_..."
@@ -202,7 +202,7 @@ const Settings: React.FC = () => {
                         clear();
                         return setHuggingFaceToken(e.target.value);
                       }}
-                      className="w-[250px] font-mono pr-8"
+                      className="w-full font-mono pr-8"
                     />
                     {huggingFaceToken && (
                       <div className="absolute right-2 top-1/2 -translate-y-1/2">
