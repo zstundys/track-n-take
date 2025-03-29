@@ -98,26 +98,39 @@ self.addEventListener("message", async (event: MessageEvent<InputMessage>) => {
           assert(imageData instanceof Blob, "Image data must be a Blob");
           assert(client, "Client is not initialized");
 
-          const result = await client.zeroShotImageClassification({
-            inputs: imageData,
-            model: "openai/clip-vit-large-patch14",
-            parameters: {
-              candidate_labels: [
-                "fruits-vegetables",
-                "dairy-and-eggs",
-                "meat-fish",
-                "grains",
-                "canned-goods",
-                "spices",
-                "snacks",
-                "beverages",
-                "other",
-              ],
-            },
-            provider: "hf-inference",
-          });
-          log("Classification result:", result);
-          sendMessage(aCategorizeImageResultMessage(result));
+          const [imageToTextResult, classificationResult] = await Promise.all([
+            client.imageToText({
+              data: imageData,
+              model: "Salesforce/blip-image-captioning-base",
+            }),
+            client.zeroShotImageClassification({
+              inputs: imageData,
+              model: "openai/clip-vit-large-patch14",
+              parameters: {
+                candidate_labels: [
+                  "fruits-vegetables",
+                  "dairy-and-eggs",
+                  "meat-fish",
+                  "grains",
+                  "canned-goods",
+                  "spices",
+                  "snacks",
+                  "beverages",
+                  "other",
+                ],
+              },
+              provider: "hf-inference",
+            }),
+          ]);
+
+          log("Classification result:", classificationResult);
+          log("Image to text result:", imageToTextResult);
+          sendMessage(
+            aCategorizeImageResultMessage(
+              classificationResult,
+              imageToTextResult
+            )
+          );
         } catch (e) {
           const errorMessage = e instanceof Error ? e.message : String(e);
           error("Classification error:", e);

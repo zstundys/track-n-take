@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useId, ComponentProps } from "react";
+import React, {
+  useState,
+  useEffect,
+  useId,
+  ComponentProps,
+  useRef,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -86,18 +92,24 @@ const AddItem: React.FC = () => {
   };
 
   const imageBlob = imageId ? getImageAsBlob(imageId) : undefined;
+  const isLoadingRef = useRef(false);
 
   useEffect(() => {
-    if (imageBlob) {
+    if (imageBlob && !isLoadingRef.current) {
+      isLoadingRef.current = true;
+
       categorizeImage(imageBlob).then((result) => {
         if (result) {
-          const bestMatch = result[0].label;
+          const bestMatch = result.classification[0].label as CategoryId;
 
           setCategoryId(bestMatch);
+          setName(result.description?.generated_text ?? "");
         }
+
+        isLoadingRef.current = false;
       });
     }
-  });
+  }, [categorizeImage, imageBlob]);
 
   // Remove image
   const handleRemoveImage = () => {

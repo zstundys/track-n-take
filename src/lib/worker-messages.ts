@@ -1,4 +1,7 @@
-import type { ZeroShotImageClassificationOutput } from "@huggingface/tasks";
+import type {
+  ImageToTextOutput,
+  ZeroShotImageClassificationOutput,
+} from "@huggingface/tasks";
 
 export const HUGGINGFACE_TOKEN_STORAGE_KEY = "huggingface-token";
 const token = () => localStorage.getItem(HUGGINGFACE_TOKEN_STORAGE_KEY);
@@ -17,11 +20,15 @@ export const aCategorizeImageMessage = (imageData: Blob) =>
   } as const);
 
 export const aCategorizeImageResultMessage = (
-  result: ZeroShotImageClassificationOutput
+  classification: ZeroShotImageClassificationOutput,
+  description: ImageToTextOutput
 ) =>
   ({
     status: "complete",
-    output: result,
+    output: {
+      classification,
+      description,
+    },
     type: "CATEGORIZE_IMAGE",
   } as const);
 
@@ -62,3 +69,8 @@ export type OutputMessage =
   | ReturnType<typeof aValidateTokenErrorMessage>
   | ReturnType<typeof aCategorizeImageResultMessage>
   | ReturnType<typeof aCategorizeImageErrorMessage>;
+
+export type OutputMessageResult<Key extends OutputMessage["type"]> = Extract<
+  OutputMessage,
+  { type: Key; status: "complete" }
+>["output"];

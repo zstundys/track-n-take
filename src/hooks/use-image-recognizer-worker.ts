@@ -4,6 +4,7 @@ import {
   HUGGINGFACE_TOKEN_STORAGE_KEY,
   InputMessage,
   OutputMessage,
+  OutputMessageResult,
 } from "@/lib/worker-messages";
 import { Category, CategoryId } from "@/types";
 import { assert } from "console";
@@ -24,6 +25,7 @@ export function useImageRecognizerWorker() {
     isClientValidGlobal
   );
   const [isInitializing, setIsInitializing] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
 
   useEffect(() => {
     const huggingFaceToken =
@@ -79,6 +81,14 @@ export function useImageRecognizerWorker() {
     });
   }, []);
 
+  useEffect(() => {
+    if (isThinking) {
+      document.documentElement.classList.add("loading");
+    } else {
+      document.documentElement.classList.remove("loading");
+    }
+  }, [isThinking]);
+
   const dispatch = useCallback(
     (message: InputMessage) => {
       if (!isClientValid) {
@@ -86,17 +96,17 @@ export function useImageRecognizerWorker() {
         return undefined;
       }
 
-      return new Promise<{ score: number; label: CategoryId }[]>(
+      return new Promise<OutputMessageResult<"CATEGORIZE_IMAGE">>(
         (resolve, reject) => {
+          setIsThinking(true);
           worker.postMessage(message);
           const onMessageReceived = (e: MessageEvent<OutputMessage>) => {
             // Only process messages related to this dispatch
             if (e.data.type === message.type) {
               worker.removeEventListener("message", onMessageReceived);
+              setIsThinking(false);
               if (e.data.status === "complete") {
-                resolve(
-                  e.data.output as { score: number; label: CategoryId }[]
-                );
+                resolve(e.data.output);
               } else {
                 reject(new Error(e.data.output || "Worker returned an error"));
               }

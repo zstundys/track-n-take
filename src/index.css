@@ -147,3 +147,80 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+
+@property --hue {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+@property --scale {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+:root {
+  --lightness: 90%;
+  --chroma: 0.9;
+  --turn: 20;
+  --textColor: oklch(20% 0.01 var(--hue));
+  --color1: oklch(var(--lightness) var(--chroma) var(--hue));
+  --color2: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 1));
+  --color3: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 2));
+  --color4: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 3));
+  --color5: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 4));
+  --color6: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 5));
+  --color7: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 6));
+  --color8: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 7));
+  --color9: oklch(var(--lightness) var(--chroma) calc(var(--hue) + var(--turn) * 8));
+}
+
+
+
+html {
+  position: relative;
+  min-height: 100vh;
+  animation: 14s rotate infinite;
+  animation-play-state: paused;
+}
+
+html:is(.loading) {
+  animation-play-state: running;
+}
+
+html:is(.loading) body::after {
+  opacity: 1;
+}
+
+body::after {
+  position: absolute;
+  inset: 0;
+  width: 2cm;
+  opacity: 0;
+  content: '';
+  pointer-events: none;
+  height: 100%;
+  background-image:
+    radial-gradient(at 0% 0%, var(--color1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, var(--color2) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, var(--color3) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, var(--color4) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, var(--color5) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, var(--color6) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, var(--color7) 0px, transparent 50%),
+    radial-gradient(at 100% 50%, var(--color8) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, var(--color9) 0px, transparent 50%);
+  mask-image: linear-gradient(to right, white 0%, transparent 80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--textColor);
+}
+
+@keyframes rotate {
+  100% {
+    --hue: 360;
+  }
+}
