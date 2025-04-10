@@ -1,11 +1,80 @@
-import { createRxDatabase, addRxPlugin } from "rxdb";
+import {
+  createRxDatabase,
+  addRxPlugin,
+  RxDatabase,
+  RxCollection,
+  RxJsonSchema,
+  ExtractDocumentTypeFromTypedRxJsonSchema,
+  toTypedRxJsonSchema,
+} from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
-import { pantryItemSchema } from "../types";
+import { PantryItem } from "@/types";
 
-// Add plugins
+const pantryItemSchema = {
+  version: 1,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+      maxLength: 100,
+    },
+    name: {
+      type: "string",
+    },
+    quantity: {
+      type: "number",
+      minimum: 0,
+    },
+    unit: {
+      type: "string",
+      default: "item",
+    },
+    categoryId: {
+      type: ["string", "null"],
+      default: null,
+    },
+    expirationDate: {
+      type: ["number", "null"],
+      default: null,
+    },
+    notes: {
+      type: "string",
+      default: "",
+    },
+    isFinished: {
+      type: "boolean",
+      default: false,
+    },
+    image: {
+      type: ["string", "null"],
+      default: null,
+    },
+    barcode: {
+      type: ["string", "null"],
+      default: null,
+    },
+    createdAt: {
+      type: "number",
+    },
+    updatedAt: {
+      type: "number",
+    },
+  },
+  required: ["id", "name", "quantity", "createdAt", "updatedAt"],
+} as const satisfies RxJsonSchema<PantryItem>;
+
+type PantryItemDoc = ExtractDocumentTypeFromTypedRxJsonSchema<
+  typeof pantryItemSchema
+>;
+
+if (process.env.NODE_ENV === "development") {
+  addRxPlugin(RxDBDevModePlugin);
+}
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
@@ -17,22 +86,26 @@ const categorySchema = {
   type: "object",
   primaryKey: "id",
   properties: {
-    id: { type: "string" },
+    id: { type: "string", maxLength: 100 },
     name: { type: "string" },
     color: { type: "string" },
     icon: { type: "string" },
     createdAt: { type: "number" },
   },
   required: ["id", "name", "color", "icon", "createdAt"],
-};
+} as const;
+
+type CategoryDoc = ExtractDocumentTypeFromTypedRxJsonSchema<
+  typeof categorySchema
+>;
 
 const shoppingItemSchema = {
   title: "Shopping Item Schema",
-  version: 0,
+  version: 3,
   type: "object",
   primaryKey: "id",
   properties: {
-    id: { type: "string" },
+    id: { type: "string", maxLength: 100 },
     name: { type: "string" },
     quantity: { type: "number" },
     unit: { type: "string" },
@@ -50,16 +123,25 @@ const shoppingItemSchema = {
     "isChecked",
     "createdAt",
   ],
-};
+} as const;
+type ShoppingItemDoc = ExtractDocumentTypeFromTypedRxJsonSchema<
+  typeof shoppingItemSchema
+>;
+
+type AppRxDatabase = RxDatabase<{
+  items: RxCollection<PantryItemDoc>;
+  categories: RxCollection<CategoryDoc>;
+  shopping_list: RxCollection<ShoppingItemDoc>;
+}>;
 
 // Database instance
-let dbPromise: Promise<any> | null = null;
+let dbPromise: Promise<AppRxDatabase> | null = null;
 
 export const getDatabase = async () => {
   if (dbPromise) return dbPromise;
 
-  dbPromise = createRxDatabase({
-    name: "pantrydb.v3",
+  dbPromise = createRxDatabase<AppRxDatabase>({
+    name: "pantrydb-v4",
     storage: getRxStorageDexie(),
   }).then(async (db) => {
     // Create collections
@@ -67,15 +149,19 @@ export const getDatabase = async () => {
       items: {
         schema: pantryItemSchema,
         migrationStrategies: {
-          // Add migrations as needed
-          1: (oldDoc: any) => oldDoc, // Initial version
+          1: (oldDoc) => oldDoc,
         },
       },
       categories: {
         schema: categorySchema,
       },
-      shoppingList: {
+      shopping_list: {
         schema: shoppingItemSchema,
+        migrationStrategies: {
+          1: (oldDoc) => oldDoc,
+          2: (oldDoc) => oldDoc,
+          3: (oldDoc) => oldDoc,
+        },
       },
     });
 
@@ -89,14 +175,15 @@ export const getDatabase = async () => {
 };
 
 // Initialize default data
-const initializeDefaultData = async (db: any) => {
+const initializeDefaultData = async (db: AppRxDatabase) => {
   try {
     // Initialize with default categories if needed
     const categoriesCount = await db.categories.count().exec();
 
     if (categoriesCount === 0) {
       const now = Date.now();
-      const defaultCategories = [
+
+      await db.categories.bulkInsert([
         {
           id: "fruits-vegetables",
           name: "Fruits & Vegetables", // Will be translated when displayed
@@ -160,9 +247,7 @@ const initializeDefaultData = async (db: any) => {
           icon: "box",
           createdAt: now + 8,
         },
-      ];
-
-      await db.categories.bulkInsert(defaultCategories);
+      ]);
     }
   } catch (error) {
     console.error("Error initializing default data:", error);

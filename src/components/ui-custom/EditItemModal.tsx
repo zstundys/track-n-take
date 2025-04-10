@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { PantryItem, Category, Unit, translateUnit } from "@/types";
+import { MAX_ITEM_QUANTITY } from "@/constants/limits";
+import { useIntl } from "@/hooks/useIntl";
+import { usePantryItems } from "@/hooks/usePantryItems";
+import { Category, PantryItem } from "@/types";
 import { translateCategory } from "@/utils/category.hooks";
+import { Save, ShoppingCart } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "./Badge";
-import { Minus, Plus, ShoppingCart, Save, Trash2 } from "lucide-react";
+import DatePickerWithPresets from "./DatePickerWithPresets";
 
 interface EditItemModalProps {
   item: PantryItem | null;
@@ -23,7 +26,6 @@ interface EditItemModalProps {
   onClose: () => void;
   onUpdate: (id: string, updates: Partial<PantryItem>) => Promise<boolean>;
   onAddToShoppingList: (item: PantryItem) => Promise<boolean>;
-  onDelete?: (id: string) => Promise<boolean>;
 }
 
 const EditItemModal: React.FC<EditItemModalProps> = ({
@@ -33,10 +35,13 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   onClose,
   onUpdate,
   onAddToShoppingList,
-  onDelete,
 }) => {
   const { t } = useTranslation();
+  const api = usePantryItems();
   const [quantity, setQuantity] = useState<number>(0);
+  const [expirationDate, setExpirationDate] = useState<Date | undefined>(
+    undefined
+  );
   const [isUpdating, setIsUpdating] = useState(false);
   const [isAddingToShoppingList, setIsAddingToShoppingList] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -44,6 +49,9 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   useEffect(() => {
     if (item) {
       setQuantity(item.quantity);
+      setExpirationDate(
+        item.expirationDate ? new Date(item.expirationDate) : undefined
+      );
     }
   }, [item]);
 
@@ -51,14 +59,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
   const handleQuantityChange = (newValue: number[]) => {
     setQuantity(newValue[0]);
-  };
-
-  const handleIncrement = () => {
-    setQuantity((prev) => Math.min(prev + 1, 100));
-  };
-
-  const handleDecrement = () => {
-    setQuantity((prev) => Math.max(prev - 1, 0));
   };
 
   const handleSave = async () => {
@@ -70,6 +70,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       const updates: Partial<PantryItem> = {
         quantity,
         isFinished: quantity === 0,
+        expirationDate: expirationDate ? expirationDate.getTime() : null,
       };
 
       const success = await onUpdate(item.id, updates);
@@ -93,36 +94,14 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     }
   };
 
-  const handleDelete = async () => {
-    if (!item || !onDelete) return;
-
-    // Show confirmation dialog
-    const confirmMessage = t("pantry.edit.deleteConfirmation", {
-      name: item.name,
-    });
-    const isConfirmed = window.confirm(confirmMessage);
-
-    if (!isConfirmed) return;
-
-    setIsDeleting(true);
-    try {
-      const success = await onDelete(item.id);
-      if (success) {
-        onClose();
-      }
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span>{item.name}</span>
             {category && (
-              <Badge variant={category.color as any} className="ml-2">
+              <Badge variant={category.color} className="ml-2">
                 {translateCategory(t, category.id)}
               </Badge>
             )}
@@ -135,47 +114,26 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
               {t("pantry.itemCard.quantity")}
             </Label>
 
-            <div className="flex items-center gap-4 mb-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleDecrement}
-                disabled={quantity <= 0}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
+            <Slider
+              value={[quantity]}
+              min={0}
+              max={MAX_ITEM_QUANTITY}
+              step={1}
+              onValueChange={handleQuantityChange}
+            />
+          </div>
 
-              <div className="flex-1">
-                <Slider
-                  value={[quantity]}
-                  min={0}
-                  max={50}
-                  step={1}
-                  onValueChange={handleQuantityChange}
-                />
-              </div>
+          <div className="mb-6">
+            <Label className="text-base font-medium mb-2 block">
+              {t("pantry.itemCard.expirationDate")}
+            </Label>
 
-              <Button variant="outline" size="icon" onClick={handleIncrement}>
-                <Plus className="h-4 w-4" />
-              </Button>
-
-              <div className="w-16">
-                <Input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  min={0}
-                  max={100}
-                />
-              </div>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              <p>
-                {t("pantry.edit.currentAmount")}: {quantity}{" "}
-                {translateUnit(t, item.unit)}
-              </p>
-            </div>
+            <DatePickerWithPresets
+              value={expirationDate}
+              onDateChange={setExpirationDate}
+              placeholder={t("pantry.edit.pickDate")}
+              fromDate={new Date()}
+            />
           </div>
         </div>
 
@@ -198,21 +156,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             <ShoppingCart className="h-4 w-4" />
             <span>{t("pantry.itemCard.addToShopping")}</span>
           </Button>
-
-          <div className="grow" />
-
-          {onDelete && (
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              title={t("common.delete")}
-              className="order-last sm:order-none"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

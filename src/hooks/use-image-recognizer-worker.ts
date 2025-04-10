@@ -26,6 +26,7 @@ export function useImageRecognizerWorker() {
   );
   const [isInitializing, setIsInitializing] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const huggingFaceToken =
@@ -71,7 +72,9 @@ export function useImageRecognizerWorker() {
           } else {
             setIsClientValid(null);
             setIsInitializing(false);
-            reject(new Error(e.data.output || "Worker returned an error"));
+            const nextError = e.data.output || "Worker returned an error";
+            setError(nextError);
+            reject(new Error(nextError));
           }
         }
       };
@@ -83,9 +86,7 @@ export function useImageRecognizerWorker() {
 
   useEffect(() => {
     if (isThinking) {
-      document.documentElement.classList.add("loading");
     } else {
-      document.documentElement.classList.remove("loading");
     }
   }, [isThinking]);
 
@@ -108,7 +109,9 @@ export function useImageRecognizerWorker() {
               if (e.data.status === "complete") {
                 resolve(e.data.output);
               } else {
-                reject(new Error(e.data.output || "Worker returned an error"));
+                const nextError = e.data.output || "Worker returned an error";
+                setError(nextError);
+                reject(new Error(nextError));
               }
             }
           };
@@ -132,6 +135,8 @@ export function useImageRecognizerWorker() {
   return {
     isWorkerReady,
     isClientValid,
+    isThinking,
+    error,
     clear: () => setIsClientValid(null),
     isInitializing,
     validateToken,

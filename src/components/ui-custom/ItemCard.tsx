@@ -146,7 +146,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Badge variant={category.color as any}>
+                <Badge variant={category.color}>
                   {translateCategory(t, category.id)}
                 </Badge>
                 {getStatusBadge()}
@@ -172,28 +172,23 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
           <div className="mt-2 text-sm text-muted-foreground">
             <p>
-              {item.quantity} {translateUnit(t, item.unit)}
+              {item.quantity} {translateUnit(t, item.unit, item.quantity)}{" "}
+              {item.expirationDate && (
+                <>
+                  ·{" "}
+                  <time
+                    className={cn(
+                      isExpired && "text-destructive",
+                      isExpiringSoon && "text-amber-500"
+                    )}
+                    dateTime={new Date(item.expirationDate).toISOString()}
+                    title={formatDate(item.expirationDate)}
+                  >
+                    {getExpirationText()}
+                  </time>
+                </>
+              )}
             </p>
-
-            {item.expirationDate && (
-              <div className="text-sm text-muted-foreground mb-2">
-                <span>{t("pantry.itemCard.expires")}: </span>
-                <span
-                  className={cn(
-                    isExpired && "text-destructive",
-                    isExpiringSoon && "text-amber-500"
-                  )}
-                >
-                  {formatDate(item.expirationDate)} ({getExpirationText()})
-                </span>
-              </div>
-            )}
-
-            {item.purchaseDate && (
-              <p className="mt-1 text-xs">
-                Purchased: {formatDate(item.purchaseDate)}
-              </p>
-            )}
           </div>
         </div>
       </Card>

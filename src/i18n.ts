@@ -1,11 +1,11 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import ICU from 'i18next-icu';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import ICU from "i18next-icu";
 
 // Import translations
-import enTranslation from './locales/en/translation.json';
-import ltTranslation from './locales/lt/translation.json';
+import enTranslation from "./locales/en.json";
+import ltTranslation from "./locales/lt.json";
 
 // Configure i18next
 i18n
@@ -19,18 +19,18 @@ i18n
   .init({
     resources: {
       en: {
-        translation: enTranslation
+        translation: enTranslation,
       },
       lt: {
-        translation: ltTranslation
-      }
+        translation: ltTranslation,
+      },
     },
-    fallbackLng: 'en',
+    fallbackLng: "en",
     debug: true,
 
     // Common namespace used around the app
-    ns: ['translation'],
-    defaultNS: 'translation',
+    ns: ["translation"],
+    defaultNS: "translation",
 
     interpolation: {
       escapeValue: false, // React already safes from XSS
@@ -38,10 +38,10 @@ i18n
 
     // Language detection options
     detection: {
-      order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'i18nextLng',
-      caches: ['localStorage'],
-    }
+      order: ["localStorage", "navigator"],
+      lookupLocalStorage: "i18nextLng",
+      caches: ["localStorage"],
+    },
   });
 
 export default i18n;

@@ -21,7 +21,7 @@ const AppNavigation: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 w-max-content mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-50 w-max-content mx-auto w-fit">
       <div className="glass p-2 sm:p-3 mx-4 mb-4 rounded-xl sm:rounded-full max-w-sm shadow-lg border border-border dark:border-border/30 dark:bg-background/80 sm:mx-auto">
         <nav className="grid grid-flow-col grid-cols-4 items-center">
           {navItems.map((item) => {

@@ -29,7 +29,10 @@ const initializeClient = async (token: string): Promise<boolean> => {
 
   try {
     assert(token, "Token is required");
-    assert(token.startsWith("hf_"), "Invalid token format");
+    assert(
+      token.startsWith("hf_"),
+      "Invalid token format, must start with 'hf_'"
+    );
 
     client = new InferenceClient(token);
 
@@ -48,8 +51,7 @@ const initializeClient = async (token: string): Promise<boolean> => {
     return true;
   } catch (e) {
     client = null; // Reset client on error
-    log("Client initialization error:", e);
-    return false;
+    throw e;
   }
 };
 
@@ -116,7 +118,6 @@ self.addEventListener("message", async (event: MessageEvent<InputMessage>) => {
                   "spices",
                   "snacks",
                   "beverages",
-                  "other",
                 ],
               },
               provider: "hf-inference",

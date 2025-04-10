@@ -36,18 +36,7 @@ const PantryPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const {
-    items,
-    categories,
-    isLoading,
-    filter,
-    setFilter,
-    sortBy,
-    setSortBy,
-    addToShoppingList,
-    updateItem,
-    deleteItem,
-  } = usePantryItems();
+  const api = usePantryItems();
 
   const filterOptions: { value: FilterOption; label: string }[] = [
     { value: "all", label: t("pantry.filter.all") },
@@ -59,19 +48,18 @@ const PantryPage: React.FC = () => {
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: "name", label: t("pantry.sort.name") },
     { value: "expirationDate", label: t("pantry.sort.expirationDate") },
-    { value: "purchaseDate", label: t("pantry.sort.purchaseDate") },
     { value: "category", label: t("pantry.sort.category") },
   ];
 
   // Filter items by search query
-  const filteredItems = items.filter((item) =>
+  const filteredItems = api.items.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Get category for an item
   const getCategoryForItem = (categoryId: string) => {
     return (
-      categories.find((cat) => cat.id === categoryId) || {
+      api.categories.find((cat) => cat.id === categoryId) || {
         id: "unknown",
         name: t("common.unknown"),
         color: "gray",
@@ -83,12 +71,12 @@ const PantryPage: React.FC = () => {
 
   // Handle filter change
   const handleFilterChange = (value: string) => {
-    setFilter(value as FilterOption);
+    api.setFilter(value as FilterOption);
   };
 
   // Handle sort change
   const handleSortChange = (value: string) => {
-    setSortBy(value as SortOption);
+    api.setSortBy(value as SortOption);
   };
 
   // Handle item click to open edit modal
@@ -131,7 +119,7 @@ const PantryPage: React.FC = () => {
 
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 hide-scrollbar">
           <div style={{ flexShrink: 0 }}>
-            <Select value={filter} onValueChange={handleFilterChange}>
+            <Select value={api.filter} onValueChange={handleFilterChange}>
               <SelectTrigger className="h-9 gap-1">
                 <Filter className="h-4 w-4" />
                 <SelectValue placeholder={t("pantry.filter.title")} />
@@ -147,7 +135,7 @@ const PantryPage: React.FC = () => {
           </div>
 
           <div style={{ flexShrink: 0 }}>
-            <Select value={sortBy} onValueChange={handleSortChange}>
+            <Select value={api.sortBy} onValueChange={handleSortChange}>
               <SelectTrigger className="h-9 gap-1">
                 <SortAsc className="h-4 w-4" />
                 <SelectValue placeholder={t("pantry.sort.title")} />
@@ -164,7 +152,7 @@ const PantryPage: React.FC = () => {
         </div>
 
         <div className={"flex  flex-wrap gap-2 mb-6"}>
-          {categories.map((category) => (
+          {api.categories.map((category) => (
             <Badge
               key={category.id}
               variant={category.color as any}
@@ -181,7 +169,7 @@ const PantryPage: React.FC = () => {
           ))}
         </div>
 
-        {isLoading ? (
+        {api.isLoading ? (
           <div className="flex justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-primary" />
             <span className="sr-only">{t("pantry.loading")}</span>
@@ -211,7 +199,7 @@ const PantryPage: React.FC = () => {
                 key={item.id}
                 item={item}
                 category={getCategoryForItem(item.categoryId)}
-                onAddToShoppingList={() => addToShoppingList(item)}
+                onAddToShoppingList={() => api.addToShoppingList(item)}
                 onView={() => handleItemClick(item)}
               />
             ))}
@@ -227,15 +215,8 @@ const PantryPage: React.FC = () => {
         }
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
-        onUpdate={updateItem}
-        onAddToShoppingList={addToShoppingList}
-        onDelete={async (item) => {
-          const success = await deleteItem(item);
-          if (success) {
-            handleCloseEditModal();
-          }
-          return success;
-        }}
+        onUpdate={api.updateItem}
+        onAddToShoppingList={api.addToShoppingList}
       />
     </AppLayout>
   );

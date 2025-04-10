@@ -51,8 +51,14 @@ const Settings: React.FC = () => {
   );
 
   // Get worker state from hook
-  const { isWorkerReady, isClientValid, clear, isInitializing, validateToken } =
-    useImageRecognizerWorker();
+  const {
+    isWorkerReady,
+    isClientValid,
+    clear,
+    isInitializing,
+    validateToken,
+    error,
+  } = useImageRecognizerWorker();
 
   console.log("#", { isWorkerReady, isClientValid, isInitializing });
 
@@ -66,7 +72,8 @@ const Settings: React.FC = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const saveHuggingFaceToken = async () => {
+  const saveHuggingFaceToken = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       const isValid = await validateToken(huggingFaceToken);
 
@@ -172,7 +179,7 @@ const Settings: React.FC = () => {
             </div>
           </div>
 
-          <div>
+          <form onSubmit={saveHuggingFaceToken}>
             <h2 className="text-xl font-medium mb-2">API Settings</h2>
             <Separator className="mb-4" />
 
@@ -191,6 +198,7 @@ const Settings: React.FC = () => {
                     Enter your Hugging Face API token to enable image
                     recognition features
                   </p>
+                  {error && <p className="text-sm text-destructive">{error}</p>}
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <div className="relative flex-shrink">
@@ -213,7 +221,6 @@ const Settings: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={saveHuggingFaceToken}
                     disabled={isInitializing || !isWorkerReady}
                   >
                     {isInitializing ? (
@@ -232,7 +239,7 @@ const Settings: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
+          </form>
 
           <div>
             <h2 className="text-xl font-medium mb-2">

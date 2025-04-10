@@ -17,11 +17,14 @@ import {
   Scan,
   Image as ImageIcon,
   X,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
+import { Slider } from "@/components/ui/slider";
 import {
   Popover,
   PopoverContent,
@@ -39,6 +42,7 @@ import { usePantryItems } from "@/hooks/usePantryItems";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import CameraCapture from "@/components/ui-custom/CameraCapture";
+import DatePickerWithPresets from "@/components/ui-custom/DatePickerWithPresets";
 import { getImage, deleteImage, getImageAsBlob } from "@/utils/imageStorage";
 import {
   translateCategory,
@@ -51,11 +55,8 @@ import { useImageRecognizerWorker } from "@/hooks/use-image-recognizer-worker";
 import { CategoryId } from "@/types";
 
 const NOW = new Date();
-const THIRTY_DAYS_FROM_NOW = new Date();
-THIRTY_DAYS_FROM_NOW.setDate(NOW.getDate() + 30);
-
-const THIRTY_DAYS_UNTIL_NOW = new Date();
-THIRTY_DAYS_UNTIL_NOW.setDate(NOW.getDate() - 30);
+const SIX_MONTHS_FROM_NOW = new Date();
+SIX_MONTHS_FROM_NOW.setDate(NOW.getDate() + 180);
 
 const AddItem: React.FC = () => {
   const navigate = useNavigate();
@@ -71,15 +72,11 @@ const AddItem: React.FC = () => {
   const [expirationDate, setExpirationDate] = useState<Date | undefined>(
     undefined
   );
-  const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(
-    new Date()
-  );
-  const { categorizeImage } = useImageRecognizerWorker();
+  const { categorizeImage, isThinking } = useImageRecognizerWorker();
   const [notes, setNotes] = useState("");
   const [imageId, setImageId] = useState<string | null>(null);
 
-  // Form validation
-  const isFormValid = name.trim() !== "" && categoryId !== "";
+  const isFormValid = name.trim() !== "";
 
   // Handle image capture
   const handleImageCaptured = (capturedImageId: string) => {
@@ -95,21 +92,29 @@ const AddItem: React.FC = () => {
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
-    if (imageBlob && !isLoadingRef.current) {
+    if (imageBlob && !isThinking && !isLoadingRef.current) {
       isLoadingRef.current = true;
 
-      categorizeImage(imageBlob).then((result) => {
-        if (result) {
-          const bestMatch = result.classification[0].label as CategoryId;
+      document.documentElement.classList.add("loading");
 
-          setCategoryId(bestMatch);
-          setName(result.description?.generated_text ?? "");
-        }
+      categorizeImage(imageBlob)
+        .then((result) => {
+          if (result) {
+            const bestMatch = result.classification[0].label as CategoryId;
 
-        isLoadingRef.current = false;
-      });
+            setCategoryId(bestMatch);
+            setName(result.description?.generated_text ?? "");
+          }
+
+          document.documentElement.classList.remove("loading");
+          isLoadingRef.current = false;
+        })
+        .catch(() => {
+          document.documentElement.classList.remove("loading");
+          isLoadingRef.current = false;
+        });
     }
-  }, [categorizeImage, imageBlob]);
+  }, [categorizeImage, imageBlob, isThinking]);
 
   // Remove image
   const handleRemoveImage = () => {
@@ -129,9 +134,8 @@ const AddItem: React.FC = () => {
       name,
       quantity,
       unit,
-      categoryId,
+      categoryId: categoryId || null,
       expirationDate: expirationDate ? expirationDate.getTime() : null,
-      purchaseDate: purchaseDate ? purchaseDate.getTime() : null,
       notes,
       isFinished: false,
       image: imageId || undefined,
@@ -209,21 +213,20 @@ const AddItem: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-[1fr,auto] gap-4">
               <div className="space-y-2">
                 <label htmlFor="quantity" className="text-sm font-medium">
                   {t("addItem.form.quantityLabel")}
                 </label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
+                <Slider
+                  value={[quantity]}
+                  min={0}
+                  max={20}
+                  step={1}
+                  onValueChange={(newValue) => setQuantity(newValue[0])}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 max-w-max">
                 <label htmlFor="unit" className="text-sm font-medium">
                   {t("addItem.form.unitLabel")}
                 </label>
@@ -244,9 +247,6 @@ const AddItem: React.FC = () => {
                     <SelectItem value={"liter"}>
                       {t("addItem.form.unitLiter", { count: quantity })}
                     </SelectItem>
-                    <SelectItem value={"other"}>
-                      {t("addItem.form.unitOther", { count: quantity })}
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -254,8 +254,7 @@ const AddItem: React.FC = () => {
 
             <div className="space-y-2" id="terminalSelection">
               <label htmlFor="category" className="text-sm font-medium">
-                {t("addItem.form.categoryLabel")}{" "}
-                <span className="text-destructive">*</span>
+                {t("addItem.form.categoryLabel")}
               </label>
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
@@ -276,7 +275,7 @@ const AddItem: React.FC = () => {
                       id={`category-${category.id}`}
                       value={category.id}
                       checked={category.id === categoryId}
-                      onChange={() => setCategoryId(category.id)}
+                      onChange={() => setCategoryId(category.id as CategoryId)}
                       className="sr-only"
                     />
                     {translateCategory(t, category.id)}
@@ -285,25 +284,20 @@ const AddItem: React.FC = () => {
               </div>
             </div>
 
-            <DateSelect
-              label={t("addItem.form.expirationLabel")}
-              value={expirationDate}
-              onDateChange={setExpirationDate}
-              placeholder={t("addItem.form.expirationPlaceholder")}
-              fromDate={NOW}
-              toDate={THIRTY_DAYS_FROM_NOW}
-            />
+            <div className="space-y-2">
+              <label htmlFor="expirationDate" className="text-sm font-medium">
+                {t("addItem.form.expirationLabel")}
+              </label>
+              <DatePickerWithPresets
+                value={expirationDate}
+                onDateChange={setExpirationDate}
+                placeholder={t("addItem.form.expirationPlaceholder")}
+                fromDate={NOW}
+                toDate={SIX_MONTHS_FROM_NOW}
+              />
+            </div>
 
             <span className="dark:bg-green-800"></span>
-
-            <DateSelect
-              label={t("addItem.form.purchaseDateLabel")}
-              value={purchaseDate}
-              onDateChange={setPurchaseDate}
-              placeholder={t("addItem.form.purchaseDatePlaceholder")}
-              toDate={NOW}
-              fromDate={THIRTY_DAYS_UNTIL_NOW}
-            />
 
             <div className="space-y-2">
               <label htmlFor="notes" className="text-sm font-medium">
@@ -334,60 +328,4 @@ const AddItem: React.FC = () => {
   );
 };
 
-type DateSelectProps = {
-  label: string;
-  value: Date | undefined;
-  onDateChange: (date: Date | undefined) => void;
-  placeholder: string;
-} & Pick<ComponentProps<typeof Calendar>, "toDate" | "fromDate">;
-
-const DateSelect: React.FC<DateSelectProps> = ({
-  label,
-  value,
-  onDateChange,
-  placeholder,
-  toDate,
-  fromDate,
-}) => {
-  const id = useId();
-  const [open, setOpen] = useState(false);
-  const { shortDate } = useIntl();
-  const htmlId = `date-select-${id}`;
-
-  return (
-    <div className="space-y-2">
-      <label htmlFor={htmlId} className="text-sm font-medium">
-        {label}
-      </label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id={htmlId}
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !value && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? shortDate.format(value) : <span>{placeholder}</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={value}
-            fromDate={fromDate}
-            toDate={toDate}
-            onSelect={(date) => {
-              setOpen(false);
-              onDateChange(date);
-            }}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
-};
 export default AddItem;
